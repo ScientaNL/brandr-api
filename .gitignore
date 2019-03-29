@@ -4,4 +4,3 @@
 .env
 
 /vendor
-/resources/script/yarn-error.log
