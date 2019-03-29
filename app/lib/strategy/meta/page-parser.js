@@ -65,10 +65,10 @@ class PageParser {
 
 			nodes.forEach(function (node) {
 
-				let value = extractors[iq.extractor](node);
+				let src = extractors[iq.extractor](node);
 
-				if (value !== null && value !== undefined) {
-					matches.push({value: makeUrlAbsolute(value), weight: iq.weight, type: iq.type});
+				if (src !== null && src !== undefined) {
+					matches.push({src: makeUrlAbsolute(src), weight: iq.weight});
 				}
 
 			});
@@ -80,8 +80,7 @@ class PageParser {
 
 			refiners.forEach(function (adjuster) {
 
-				if (adjuster.regex.test(match.url)) {
-
+				if (match.src.match(adjuster.regex)) {
 					match.weight *= adjuster.force;
 				}
 			});
