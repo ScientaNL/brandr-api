@@ -1,41 +1,81 @@
-FROM ubuntu:xenial
+FROM node:10-slim
 
-RUN apt-get update && apt-get install -y \
-	curl \
-	git
+RUN apt-get update && apt-get install -yq \
+	gconf-service \
+	libasound2 \
+	libatk1.0-0 \
+	libc6 \
+	libcairo2 \
+	libcups2 \
+	libdbus-1-3 \
+	libexpat1 \
+	libfontconfig1 \
+	libgcc1 \
+	libgconf-2-4 \
+	libgdk-pixbuf2.0-0 \
+	libglib2.0-0 \
+	libgtk-3-0 \
+	libnspr4 \
+	libpango-1.0-0 \
+	libpangocairo-1.0-0 \
+	libstdc++6 \
+	libx11-6 \
+	libx11-xcb1 \
+	libxcb1 \
+	libxcomposite1 \
+	libxcursor1 \
+	libxdamage1 \
+	libxext6 \
+	libxfixes3 \
+	libxi6 \
+	libxrandr2 \
+	libxrender1 \
+	libxss1 \
+	libxtst6 \
+	fonts-ipafont-gothic \
+	fonts-wqy-zenhei \
+	fonts-thai-tlwg \
+	fonts-kacst \
+	ttf-freefont \
+	ca-certificates \
+	fonts-liberation \
+	libappindicator1 \
+	libnss3 \
+	lsb-release \
+	xdg-utils \
+	wget \
+	gnupg \
+	dirmngr \
+	&& wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb \
+	&& dpkg -i dumb-init_*.deb \
+	&& rm -f dumb-init_*.deb \
+	&& apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-	&& curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-	&& curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-	&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+#RUN groupadd --gid 1001 pptruser \
+#	&& useradd --uid 1001 --gid pptruser --groups audio,video --shell /bin/bash --create-home pptruser
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser
 
-RUN apt-get update && apt-get install -y \
-	nodejs \
-	yarn \
-	libcairo2-dev \
-	libjpeg-dev \
-	libpango1.0-dev \
-	libgif-dev \
-	libpng-dev \
-	build-essential \
-	g++
+RUN yarn global add nodemon puppeteer@1.14.0 && yarn cache clean
 
-RUN groupadd --gid 1000 node \
-  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+ENV NODE_PATH="/usr/local/share/.config/yarn/global/node_modules:${NODE_PATH}"
 
-RUN yarn global add nodemon
+# Set language to UTF8
+ENV LANG="C.UTF-8"
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Run custom commands by overwriting docker entrypoint
 COPY ./docker/docker-node-entrypoint /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-node-entrypoint
 
 # Install app dependencies
-COPY ./app /usr/src/app/
+COPY ./app /app/
 RUN yarn install
 
-ENTRYPOINT ["docker-node-entrypoint"]
+RUN chown -R pptruser:pptruser /app
 
-EXPOSE 80
-CMD [ "node", "/usr/src/app/index.js" ]
+USER pptruser
+
+ENTRYPOINT ["dumb-init", "--"]
+
+CMD [ "node", "index.js" ]
