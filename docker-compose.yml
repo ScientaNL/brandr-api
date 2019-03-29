@@ -11,5 +11,5 @@ services:
       - "${BIND_INTERFACE}:1337:3000"
     environment:
       - NODE_ENV=dev
-    #entrypoint: docker-node-entrypoint #nodemon /app/index.js
-    command: nodemon /app/index.js
+      - DEBUG=*,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
+    command: nodemon /app/index.js #tail -f /dev/null

@@ -6,6 +6,7 @@ const Router = require('koa-router');
 const URI = require('urijs');
 const logger = require('koa-logger');
 const json = require('koa-json');
+const debug = require('debug')('http');
 
 const app = new Koa();
 const router = new Router();
@@ -54,7 +55,7 @@ router.get('/example/:variable', async (ctx, next) => {
 
 const koaLog = logger();
 app.use(async function (ctx, next) {
-	return koaLog(ctx, next);
+	return debug.enabled ? koaLog(ctx, next) : await next();
 });
 
 app.use(json());
