@@ -18,40 +18,20 @@ class PageParser {
 		return [
 			{type: 'meta/property=og:image', query: 'meta[property="og:image"]', weight: 1, extractor: 'meta'},
 			{type: 'meta/property=og:image:url', query: 'meta[property="og:image:url"]', weight: 1, extractor: 'meta'},
-			{
-				type: 'meta/property=og:image:secure-url',
-				query: 'meta[property="og:image:secure_url"]',
-				weight: 1,
-				extractor: 'meta'
-			},
+			{type: 'meta/property=og:image:secure-url', query: 'meta[property="og:image:secure_url"]', weight: 1, extractor: 'meta'},
 			{type: 'meta/name=twitter:image', query: 'meta[name="twitter:image"]', weight: 1, extractor: 'meta'},
 			{type: 'meta/content=logo', query: 'meta[content="logo"]', weight: 2, extractor: 'meta'},
 			{type: 'meta/content=image', query: 'meta[content="image"]', weight: 1, extractor: 'meta'},
 			{type: 'meta/itemprop=logo', query: 'meta[itemprop="logo"]', weight: 2, extractor: 'meta'},
 			{type: 'meta/itemprop=image', query: 'meta[itemprop="image"]', weight: 1, extractor: 'meta'},
-			{
-				type: 'meta/name=msapplication-TileImage',
-				query: 'meta[name="msapplication-TileImage"]',
-				weight: 1.5,
-				extractor: 'meta'
-			},
-			{
-				type: 'meta/name=msapplication-TileImage',
-				query: 'meta[name^="msapplication-square"]',
-				weight: 1.5,
-				extractor: 'meta'
-			},
+			{type: 'meta/name=msapplication-TileImage', query: 'meta[name="msapplication-TileImage"]', weight: 1.5, extractor: 'meta'},
+			{type: 'meta/name=msapplication-TileImage', query: 'meta[name^="msapplication-square"]', weight: 1.5, extractor: 'meta'},
 			{type: 'link/rel=logo', query: 'link[rel="logo"]', weight: 2, extractor: 'link'},
 			{type: 'link/rel=shortcut-icon', query: 'link[rel="shortcut-icon"]', weight: 1.5, extractor: 'link'},
 			{type: 'link/rel=shortcut-icon', query: 'link[rel="shortcut icon"]', weight: 1.5, extractor: 'link'},
 			{type: 'link/rel=fluid-icon', query: 'link[rel="fluid-icon"]', weight: 2, extractor: 'link'},
 			{type: 'link/rel=apple-touch-icon', query: 'link[rel="apple-touch-icon"]', weight: 2, extractor: 'link'},
-			{
-				type: 'link/rel=apple-touch-icon-precomposed',
-				query: 'link[rel="apple-touch-icon-precomposed"]',
-				weight: 2,
-				extractor: 'link'
-			},
+			{type: 'link/rel=apple-touch-icon-precomposed', query: 'link[rel="apple-touch-icon-precomposed"]', weight: 2, extractor: 'link'},
 			{type: 'script/type=json', query: 'script[type="application/ld+json"]', weight: 2, extractor: 'json'}
 		];
 	}
@@ -96,15 +76,15 @@ class PageParser {
 
 
 		// refine weight
-		for (let i = 0; i < matches.length; i++) {
+		matches.forEach(function (match) {
 
 			refiners.forEach(function (adjuster) {
 
-				if (matches[i].value.match(adjuster.regex)) {
-					matches[i].weight *= adjuster.force;
+				if (match.value.match(adjuster.regex)) {
+					match.weight *= adjuster.force;
 				}
 			});
-		}
+		});
 
 
 		return {
