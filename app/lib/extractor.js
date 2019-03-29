@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const GetBodyHtml = require('./strategy/get-body-html/strategy');
+const debug = require('debug')('extractor');
+debug.log = console.log.bind(console);
 
 class Extractor
 {
@@ -12,10 +14,19 @@ class Extractor
 		this.strategies.push(strategyInstance);
 	}
 
+	async configurePage(page) {
+		await page.setBypassCSP(true);
+
+		page.on('console', this.pageConsole);
+		page.on('pageerror', this.pageError);
+		page.on('response', this.pageResponse);
+		page.on('requestfailed', this.pageRequestFailed);
+	}
+
 	async runStrategies(uri) {
 		const browser = await puppeteer.launch({args: ['--no-sandbox']});
 		const page = await browser.newPage();
-		await page.setBypassCSP(true);
+		await this.configurePage(page);
 		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
 
 		let results = {};
@@ -28,6 +39,22 @@ class Extractor
 
 		await browser.close();
 		return results;
+	}
+
+	pageConsole(msg) {
+		debug('page-console:', msg.text());
+	}
+
+	pageError(error) {
+		debug('page-error:', error.message);
+	}
+
+	pageResponse(response) {
+		debug('page-response:', response.status(), response.url());
+	}
+
+	pageRequestFailed(request) {
+		debug('page-requestfailed:', request.failure().errorText, request.url());
 	}
 }
 
