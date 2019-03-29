@@ -87,7 +87,7 @@ class PageParser {
 
 				let value = extractors[iq.extractor](node);
 
-				if (value !== null) {
+				if (value !== null && value !== undefined) {
 					matches.push({value: makeUrlAbsolute(value), weight: iq.weight, type: iq.type});
 				}
 
