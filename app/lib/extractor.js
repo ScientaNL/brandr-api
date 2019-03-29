@@ -1,11 +1,13 @@
 const puppeteer = require('puppeteer');
 const GetBodyHtml = require('./strategy/get-body-html/strategy');
+const getColors = require('./strategy/get-colors/strategy');
 
 class Extractor
 {
 	constructor() {
 		this.strategies = [];
-		this.registerStrategy(new GetBodyHtml());
+		// this.registerStrategy(new GetBodyHtml());
+		this.registerStrategy(new getColors());
 	}
 
 	registerStrategy(strategyInstance) {

@@ -12,4 +12,4 @@ services:
     environment:
       - NODE_ENV=dev
     #entrypoint: docker-node-entrypoint #nodemon /app/index.js
-    command: nodemon /app/index.js #tail -f /dev/null
+    command: nodemon /app/index.js
