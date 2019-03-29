@@ -1,0 +1,7 @@
+*.DS_Store
+*.idea
+*.phan
+.env
+
+/vendor
+/resources/script/yarn-error.log
