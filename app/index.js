@@ -16,7 +16,7 @@ const router = new Router();
 /**
  * Do some scraping
  */
-const Extractor = require('./lib/Extractor');
+const Extractor = require('./lib/extractor');
 const xtract = new Extractor();
 
 router.get('/extract/:weburi', async (ctx, next) => {
