@@ -27,11 +27,13 @@ class PageParser {
 			{type: 'meta/name=msapplication-TileImage', query: 'meta[name="msapplication-TileImage"]', weight: 1.5, extractor: 'meta'},
 			{type: 'meta/name=msapplication-TileImage', query: 'meta[name^="msapplication-square"]', weight: 1.5, extractor: 'meta'},
 			{type: 'link/rel=logo', query: 'link[rel="logo"]', weight: 2, extractor: 'link'},
-			{type: 'link/rel=shortcut-icon', query: 'link[rel="shortcut-icon"]', weight: 1.5, extractor: 'link'},
-			{type: 'link/rel=shortcut-icon', query: 'link[rel="shortcut icon"]', weight: 1.5, extractor: 'link'},
+			{type: 'link/rel=icon', query: 'link[rel="logo"]', weight: 2, extractor: 'link'},
+			{type: 'link/rel=shortcut-icon', query: 'link[rel="shortcut-icon"]', weight: 2, extractor: 'link'},
+			{type: 'link/rel=shortcut icon', query: 'link[rel="shortcut icon"]', weight: 2, extractor: 'link'},
 			{type: 'link/rel=fluid-icon', query: 'link[rel="fluid-icon"]', weight: 2, extractor: 'link'},
 			{type: 'link/rel=apple-touch-icon', query: 'link[rel="apple-touch-icon"]', weight: 2, extractor: 'link'},
 			{type: 'link/rel=apple-touch-icon-precomposed', query: 'link[rel="apple-touch-icon-precomposed"]', weight: 2, extractor: 'link'},
+			{type: 'link/rel=mask-icon', query: 'link[rel="mask-icon"]', weight: 1.5, extractor: 'link'},
 			{type: 'script/type=json', query: 'script[type="application/ld+json"]', weight: 2, extractor: 'json'}
 		];
 	}
