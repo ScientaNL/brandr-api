@@ -1,5 +1,5 @@
 class PageParser {
-	cutoff = .2;
+	cutoff = .1;
 	grayDev = 4;
 	colorCount = {
 		'colors': {},
