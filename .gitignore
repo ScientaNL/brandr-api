@@ -1,8 +1,7 @@
 *.DS_Store
 *.idea
-*.phan
 .env
 
 /vendor
 /app/node_modules
-/resources/script/yarn-error.log
+/app/yarn-error.log

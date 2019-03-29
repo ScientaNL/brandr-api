@@ -1,0 +1,17 @@
+/*
+Theme Name: Avada
+Description: The #1 selling theme of all time that allows you to build virtually any design style.
+Author: ThemeFusion
+Theme URI: http://avada.theme-fusion.com/
+Author URI: http://themeforest.net/user/ThemeFusion
+Version: 5.8.2
+License: Themeforest Split Licence
+License URI: -
+Text Domain: Avada
+*/
+
+/* Classes needed by Theme Check */
+.wp-caption-text,
+.gallery-caption,
+.bypostauthor {
+}
