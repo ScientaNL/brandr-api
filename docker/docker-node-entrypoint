@@ -1,0 +1,24 @@
+#!/bin/bash
+set -Eeuo pipefail
+
+if [ "${1:0:1}" = '-' ]; then
+	set -- node "$@"
+fi
+
+originalArgOne="$1"
+
+# allow the container to be started with `--user`
+# all nodemo* commands should be dropped to the correct user
+if [[ "$originalArgOne" == nod* ]] && [ "$(id -u)" = '0' ]; then
+	# chown mount after mounting
+	chown -R pptruser /app
+
+	# make sure we can write to stdout and stderr as "pptruser"
+	# (for our "initdb" code later; see "--logpath" below)
+	chown --dereference pptruser "/proc/$$/fd/1" "/proc/$$/fd/2" || :
+	# ignore errors thanks to https://github.com/docker-library/mongo/issues/149
+
+	exec gosu pptruser "$BASH_SOURCE" "$@"
+fi
+
+exec "$@"
