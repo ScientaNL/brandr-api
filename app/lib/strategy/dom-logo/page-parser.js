@@ -1,4 +1,4 @@
-class DomLogoImage {
+class PageParser {
 	document;
 
 	minWeight = .5;
@@ -97,7 +97,7 @@ class DomLogoImage {
 			let nav = false;
 			let cookie = false;
 
-			for(let parent of DomLogoImage.getElementParents(element)) {
+			for(let parent of PageParser.getElementParents(element)) {
 				if(header === false && parent.tagName.toLowerCase() === "header") {
 					weight += .15;
 					header = true;
@@ -270,7 +270,7 @@ class DomLogoImage {
 	parseSVG(element) {
 
 		// Check if the current SVG is a subset of an SVG image.
-		for(let parent of DomLogoImage.getElementParents(element)) {
+		for(let parent of PageParser.getElementParents(element)) {
 			if(parent.tagName.toLowerCase() === "svg") {
 				return [];
 			}
@@ -449,24 +449,3 @@ class DomLogoImage {
 		return urls;
 	}
 }
-
-console.clear();
-
-let strategy = new DomLogoImage(document);
-
-setTimeout(() => {
-	console.time("a");
-	var iets = strategy.parse();
-	console.timeEnd("a");
-
-	for(let iet of iets) {
-		console.log(iet); break;
-	}
-
-	if(iets[0].logo.svg) {
-		document.body.innerHTML = iets[0].logo.svg;
-	} else if(iets[0].logo.src) {
-		document.write(`<html><img src="${iets[0].logo.src}" /></html>`);
-	}
-}, 1);
-
