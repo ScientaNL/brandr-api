@@ -26,7 +26,7 @@ class AbstractStrategy
 	}
 
 	parsePage () {
-		let parser = new PageParser();
+		let parser = new PageParser(document);
 		return parser.parse();
 	};
 
