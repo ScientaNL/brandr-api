@@ -135,6 +135,20 @@ class DOMLogoStrategyParser {
 
 			return weight;
 		},
+		(data, element, weight) => { //Am i a sprite?
+			if(!data.src) {
+				return weight;
+			}
+
+			let url = data.src.toLowerCase().split("/").slice(3).join("/");
+
+			if(url.indexOf("sprite") !== -1) {
+				weight -= .5;
+				this.log(`Url contains the word sprite. Subtracting .5. now counting ${weight}`);
+			}
+
+			return weight;
+		},
 
 	];
 
