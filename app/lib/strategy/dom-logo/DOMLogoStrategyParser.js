@@ -1,4 +1,4 @@
-class PageParser {
+class DOMLogoStrategyParser {
 	document;
 
 	minWeight = .5;
@@ -97,7 +97,7 @@ class PageParser {
 			let nav = false;
 			let cookie = false;
 
-			for(let parent of PageParser.getElementParents(element)) {
+			for(let parent of DOMLogoStrategyParser.getElementParents(element)) {
 				if(header === false && parent.tagName.toLowerCase() === "header") {
 					weight += .15;
 					header = true;
@@ -270,7 +270,7 @@ class PageParser {
 	parseSVG(element) {
 
 		// Check if the current SVG is a subset of an SVG image.
-		for(let parent of PageParser.getElementParents(element)) {
+		for(let parent of DOMLogoStrategyParser.getElementParents(element)) {
 			if(parent.tagName.toLowerCase() === "svg") {
 				return [];
 			}

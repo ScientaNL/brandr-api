@@ -17,14 +17,14 @@ const router = new Router();
 /**
  * Do some scraping
  */
-const Extractor = require('./lib/extractor');
-const xtract = new Extractor();
+const Extractor = require('./lib/Extractor');
+const extractor = new Extractor();
 
 router.get('/extract/:weburi', async (ctx, next) => {
 	let weburi = ctx.params.weburi;
 
 	// Code here
-	let extractions = await xtract.runStrategies(weburi);
+	let extractions = await extractor.runStrategies(weburi);
 
 	ctx.body = {
 		uri: weburi,
