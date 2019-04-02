@@ -1,4 +1,4 @@
-class PageParser {
+class StyleColorsStrategyParser {
 	cutoff = .1;
 	grayDev = 4;
 	colorCount = {

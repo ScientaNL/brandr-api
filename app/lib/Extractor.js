@@ -1,21 +1,19 @@
 const puppeteer = require('puppeteer');
 const debug = require('debug')('extractor');
 debug.log = console.log.bind(console);
-const GetBodyHtml = require('./strategy/get-body-html/strategy');
-const Meta = require('./strategy/meta/strategy');
-const getColors = require('./strategy/get-colors/strategy');
-const DomLogoStrategy = require('./strategy/dom-logo/strategy');
+
+const MetaLogoStrategy = require('./strategy/meta-logo/MetaLogoStrategy');
+const StyleColorsStrategy = require('./strategy/style-colors/StyleColorsStrategy');
+const DomLogoStrategy = require('./strategy/dom-logo/DomLogoStrategy');
 
 class Extractor
 {
 	constructor() {
 		this.strategies = [];
 
-		// this.registerStrategy(new GetBodyHtml());
-		// this.registerStrategy(new getColors());
-		// this.registerStrategy(new Meta());
-
 		this.registerStrategy(new DomLogoStrategy());
+		this.registerStrategy(new MetaLogoStrategy());
+		this.registerStrategy(new StyleColorsStrategy());
 	}
 
 	registerStrategy(strategyInstance) {

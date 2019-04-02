@@ -2,20 +2,8 @@ const path = require('path');
 
 class AbstractStrategy
 {
-	constructor() {
-		this.processingUri = null;
-	}
-
 	getId() {
 		return undefined;
-	}
-
-	getProcessingUri() {
-		return this.processingUri;
-	}
-
-	getDefaultParserToInject(strategyDir) {
-		return path.relative( process.cwd(), path.join(strategyDir, '/page-parser.js'));
 	}
 
 	async handlePage(uri, page) {
@@ -25,9 +13,12 @@ class AbstractStrategy
 		return await this.processParserResult(result);
 	}
 
+	getParserFilesToInject() {
+		throw new Error(`Please implement getParserFilesToInject method in strategy`);
+	}
+
 	parsePage () {
-		let parser = new PageParser(document);
-		return parser.parse();
+		throw new Error(`Please implement parsePage method in strategy`);
 	};
 
 	async processParserResult(parserResult) {

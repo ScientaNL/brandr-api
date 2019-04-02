@@ -1,4 +1,4 @@
-class PageParser {
+class MetaLogoStrategyParser {
 
 	getExtractors() {
 		return {
