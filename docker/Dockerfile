@@ -78,6 +78,8 @@ RUN chown -R pptruser:pptruser /app
 
 USER pptruser
 
+RUN mkdir -p /output
+
 ENTRYPOINT ["dumb-init", "--"]
 
 CMD [ "node", "index.js" ]
