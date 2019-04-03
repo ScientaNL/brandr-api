@@ -66,7 +66,7 @@ class Extractor
 					await page.addScriptTag({path: filePath});
 				}
 
-				groupResult[extractor.getId()] = await extractor.handlePage(uri, page, root);
+				groupResult[extractor.getId()] = await extractor.handlePage(uri, page);
 			}
 
 			results[groupName] = await group.aggregator.aggregate(groupResult);
