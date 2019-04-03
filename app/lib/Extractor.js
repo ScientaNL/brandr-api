@@ -59,7 +59,7 @@ class Extractor
 			}
 
 			let group = this.extractGroups[groupName];
-			results[groupName] = group.aggregator.aggregate(
+			results[groupName] = await group.aggregator.aggregate(
 				await this.runExtractors(group.extractors, page, uri)
 			);
 		}
