@@ -18,10 +18,6 @@ class FacebookLogoStrategy extends AbstractStrategy
 		let parser = new FacebookLogoStrategyParser(document);
 		return parser.parse();
 	};
-
-	async processParserResult(parserResult) {
-		return parserResult.matches;
-	}
 }
 
 module.exports = FacebookLogoStrategy;

@@ -50,6 +50,7 @@ class Extractor
 	}
 
 	async extract(uri) {
+		debug('extracting:', uri);
 		const page = await this.navigator.newPage(uri);
 
 		let results = {};
@@ -76,6 +77,7 @@ class Extractor
 			return null;
 		}
 
+		debug('sub-extracting:', uri);
 		const page = await this.navigator.newPage(uri);
 
 		let result = await this.runExtractors(extractors, page, uri);

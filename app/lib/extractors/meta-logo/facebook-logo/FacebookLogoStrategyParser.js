@@ -11,9 +11,7 @@ class FacebookLogoStrategyParser {
 		if (node !== undefined) {
 			src = node.childNodes[0].childNodes[0].getAttribute('src'); // a > div > img
 
-			return {
-				matches: [{src: src, type: 'facebook-logo'}]
-			};
+			return [{src: src, type: 'facebook-logo'}];
 		}
 
 		return null;
