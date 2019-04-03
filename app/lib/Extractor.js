@@ -72,6 +72,10 @@ class Extractor
 	}
 
 	async extractNewPage(uri, extractors) {
+		if (!uri || extractors.length < 1) {
+			return null;
+		}
+
 		const page = await this.navigator.newPage(uri);
 
 		let result = await this.runExtractors(extractors, page, uri);

@@ -14,13 +14,12 @@ class AbstractStrategy
 		throw new Error(`Please implement parsePage method in strategy`);
 	};
 
-	async handlePage(uri, page) {
+	async handlePage(uri, page, newPageExtractor) {
 		let result = await page.evaluate(this.parsePage);
-
-		return await this.processParserResult(result);
+		return await this.processParserResult(result, newPageExtractor);
 	}
 
-	async processParserResult(parserResult) {
+	async processParserResult(parserResult, newPageExtractor) {
 		return parserResult;
 	}
 }

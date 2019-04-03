@@ -1,7 +1,17 @@
 const AbstractStrategy = require('../AbstractStrategy');
+const TwitterLogoStrategy = require('./twitter-logo/TwitterLogoStrategy');
+const FacebookLogoStrategy = require('./facebook-logo/FacebookLogoStrategy');
 
 class MetaLogoStrategy extends AbstractStrategy
 {
+	constructor() {
+		super();
+		this.subStrategies = {
+			"twitter-logo": new TwitterLogoStrategy(),
+			"facebook-logo": new FacebookLogoStrategy()
+		}
+	}
+
 	getId() {
 		return 'meta-logo';
 	}
@@ -19,8 +29,20 @@ class MetaLogoStrategy extends AbstractStrategy
 		return parser.parse();
 	};
 
-	async processParserResult(parserResult) {
-		return parserResult.matches;
+	async processParserResult(parserResult, newPageExtractor) {
+		let result = {
+			meta: [],
+			sub: {}
+		};
+		for (const match in parserResult) {
+			if (typeof match !== 'object') {
+				result.match = match;
+			} else if (match.strategy && this.subStrategies[match.strategy]) {
+				let subStrategy = this.subStrategies[match.strategy];
+				result.sub[subStrategy.getId()] = await newPageExtractor(match.url, [subStrategy]);
+			}
+		}
+		return result;
 	}
 }
 
