@@ -10,10 +10,21 @@ class Extractor
 {
 	constructor() {
 		this.strategies = [];
+		this.extractGroups = {};
+		this.browserPromise = null;
 
-		this.registerStrategy(new DomLogoStrategy());
-		this.registerStrategy(new MetaLogoStrategy());
-		this.registerStrategy(new StyleColorsStrategy());
+		this.registerExtractGroup('logo', [
+			new DomLogoStrategy(), new MetaLogoStrategy()
+		], (a) => {return a});
+
+		this.registerExtractGroup('color', [new StyleColorsStrategy()], (a) => {return a.getColors});
+	}
+
+	registerExtractGroup(name, extractors, aggregator) {
+		this.extractGroups[name] = {
+			extractors: extractors,
+			aggregator: aggregator
+		};
 	}
 
 	registerStrategy(strategyInstance) {
@@ -30,21 +41,44 @@ class Extractor
 	}
 
 	async runStrategies(uri) {
-		const browser = await puppeteer.launch({args: ['--no-sandbox']});
+		const browser = await this.getBrowser();
+
 		const page = await browser.newPage();
 		await this.configurePage(page);
 		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
 
 		let results = {};
-		for (let strategy of this.strategies) {
-			for (let filePath of strategy.getParserFilesToInject()) {
-				await page.addScriptTag({path: filePath});
+		for (let groupName in this.extractGroups) {
+			if(this.extractGroups.hasOwnProperty(groupName) === false) {
+				continue;
 			}
-			results[strategy.getId()] = await strategy.handlePage(uri, page);
+
+			let group = this.extractGroups[groupName];
+			let groupResult = {};
+
+			for(let extractor of group.extractors) {
+				for (let filePath of extractor.getParserFilesToInject()) {
+					await page.addScriptTag({path: filePath});
+				}
+
+				groupResult[extractor.getId()] = await extractor.handlePage(uri, page);
+			}
+
+			results[groupName] = group.aggregator(groupResult);
 		}
 
-		await browser.close();
+		await page.close();
+
 		return results;
+	}
+
+	async getBrowser()
+	{
+		if(this.browserPromise) {
+			return this.browserPromise;
+		}
+
+		return this.browserPromise = puppeteer.launch({args: ['--no-sandbox']});
 	}
 
 	pageConsole(msg) {
