@@ -12,8 +12,6 @@ const app = new Koa();
 const router = new Router();
 
 
-
-
 /**
  * Do some scraping
  */
@@ -32,26 +30,6 @@ router.get('/extract/:weburi', async (ctx, next) => {
 	};
 });
 
-
-
-
-
-/**
- * Example endpoint
- */
-router.get('/example/:variable', async (ctx, next) => {
-	let queryData = URI.parseQuery(ctx.request.querystring, true),
-		error = queryData['error'] || null,
-		variable = ctx.params.variable;
-
-	if (error) {
-		ctx.throw(400, 'ERROR');
-	}
-
-	ctx.body = {
-		variable: variable
-	};
-});
 
 const koaLog = logger();
 app.use(async function (ctx, next) {
