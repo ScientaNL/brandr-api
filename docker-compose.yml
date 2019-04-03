@@ -7,10 +7,10 @@ services:
       - ./app:/app
       - ./test:/test
       - ./app/node_modules:/app/node_modules
-      - ./app/node_modules:ro:/app/resources/hosts-blocklist
+      - /app/resources/hosts-blocklist
     ports:
       - "${BIND_INTERFACE}:1337:3000"
     environment:
       - NODE_ENV=dev
-      - DEBUG=*,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
+      - DEBUG=*,-navigator:info,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
     command: nodemon /app/index.js #tail -f /dev/null

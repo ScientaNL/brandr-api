@@ -1,51 +1,118 @@
 const fs = require('fs');
 const readline = require('readline');
-const stream = require('stream');
+const debug = require('debug')('blocklist');
+debug.log = console.log.bind(console);
 
 class Blocklist
 {
 	constructor()
 	{
-		this.hosts = {};
+		this.domains = {};
+		this.fileTypes = {
+			//video
+			"3g2": true,
+			"3gp": true,
+			"avi": true,
+			"flv": true,
+			"h264": true,
+			"m4v": true,
+			"mkv": true,
+			"mov": true,
+			"mp4": true,
+			"mpg": true,
+			"mpeg": true,
+			"swf": true,
+			"vob": true,
+			"wmv": true,
+			//audio
+			"aif": true,
+			"cda": true,
+			"mid": true,
+			"midi": true,
+			"mp3": true,
+			"mpa": true,
+			"ogg": true,
+			"wav": true,
+			"wma": true,
+			"wpl": true
+		}
 	}
 
-	async isHostInBlocklist(hostName)
+	blockHost(hostName)
 	{
-		return this.hosts[hostName];
+		if (!hostName) {
+			return false;
+		}
+		let parts = hostName.split('.');
+		if (parts.length < 3) {
+			return this.domains[hostName];
+		}
+
+		let domainGuess = parts.slice(-2).join('.');
+		if (this.domains[domainGuess]) {
+			return true;
+		}
+
+		for (let suffix in this.multiPartSuffixes) {
+			if (hostName.substr(suffix.length * -1) === suffix) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	blockExtension(fileExt)
+	{
+		if (!fileExt) {
+			return false;
+		}
+		return this.fileTypes[fileExt];
+	}
+
+	blockUrl(urlString)
+	{
+		return this.fileTypes[fileExt];
 	}
 
 	async loadHosts()
 	{
-		let skipNext = false;
-		let readHosts = function ({ input }) {
-			const output = new stream.PassThrough({ objectMode: true });
-			const rl = readline.createInterface({ input });
-
-			rl.on('line', line => {
-				if (skipNext || line[0] === '#') {
-					return;
-				}
-				skipNext = true;
-				let parts = line.split(' ');
-				if (parts.length === 2 && parts[0] === '0.0.0.0') {
-					output.write(parts[1].trim());
-				}
+		let readLines = function (file, lineHandler) {
+			const reader =readline.createInterface({
+				input: fs.createReadStream(file, {encoding: 'utf8'}),
+				crlfDelay: Infinity
 			});
 
-			rl.on('close', () => {
-				output.push(null);
-			});
+			reader.on('line', lineHandler);
 
-			return output;
+			return new Promise(resolve => reader.on('close', resolve));
 		};
 
-		const input = fs.createReadStream('/app/resources/hosts-blocklist/hostnames.txt', {encoding: 'utf8'});
-		let hosts = {};
-		for await (const host of readHosts({ input })) {
-			hosts[host] = true;
-		}
+		debug('domains-reading:', '/app/resources/hosts-blocklist/domains.txt');
 
-		this.hosts = hosts;
+		let domains = {};
+		let multiPartSuffixes = {};
+		let domainCount = 0;
+		await readLines('/app/resources/hosts-blocklist/domains.txt', line => {
+			if (line[0] === '#') {
+				return;
+			}
+			let parts = line.split('/');
+			if (parts.length === 3 && parts[2] === '0.0.0.0') {
+				let domain = parts[1];
+				console.log(domain);
+				domains[domain] = true;
+				domainCount++;
+				let domainParts = domain.split('.');
+				if (domainParts.length > 2) {
+					multiPartSuffixes[domain] = domainParts.length;
+				}
+			}
+		});
+
+		this.domains = domains;
+		this.multiPartSuffixes = multiPartSuffixes;
+		debug('domains-read:', domainCount);
 	}
 }
 
