@@ -19,13 +19,15 @@ class LogoAggregator {
 		if (!data[0]) {
 			return null;
 		}
+
+
 		//For testing Use one logo to test with
 		let logo = data[0];
 
-		let hash = hasha(logo.buffer, {algorithm: 'md5'});
-		let filename = `${hash}.${logo.extension}`;
+		let hash = hasha(logo.logo.buffer, {algorithm: 'md5'});
+		let filename = `${hash}.${logo.logo.extension}`;
 
-		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.buffer);
+		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.logo.buffer);
 
 		return `${this.host}/${filename}`;
 	}
