@@ -18,7 +18,7 @@ class Extractor
 
 		this.registerExtractGroup(
 			'logo',
-			[new DomLogoStrategy()/*, new MetaLogoStrategy()*/],
+			[new DomLogoStrategy(), new MetaLogoStrategy()],
 			new LogoAggregator()
 		);
 

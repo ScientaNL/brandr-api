@@ -15,7 +15,7 @@ class MetaLogoStrategy extends AbstractStrategy
 	 * @returns {Array}
 	 */
 	parsePage () {
-		let parser = new MetaLogoStrategyParser();
+		let parser = new MetaLogoStrategyParser(document);
 		return parser.parse();
 	};
 
