@@ -45,6 +45,7 @@ class Extractor
 
 		const page = await browser.newPage();
 		await this.configurePage(page);
+
 		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
 
 		let results = {};
@@ -78,7 +79,13 @@ class Extractor
 			return this.browserPromise;
 		}
 
-		return this.browserPromise = puppeteer.launch({args: ['--no-sandbox']});
+		return this.browserPromise = puppeteer.launch({
+			args: ['--no-sandbox'],
+			defaultViewport: {
+				width: 1920,
+				height: 1080
+			}
+		});
 	}
 
 	pageConsole(msg) {
