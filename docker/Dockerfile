@@ -64,6 +64,8 @@ ENV LANG="C.UTF-8"
 
 WORKDIR /app
 
+RUN wget -P /app/resources/hosts-blocklist https://github.com/notracking/hosts-blocklists/raw/master/domains.txt
+
 # Run custom commands by overwriting docker entrypoint
 COPY ./docker/docker-node-entrypoint /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-node-entrypoint

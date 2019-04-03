@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer');
 const debug = require('debug')('extractor');
 debug.log = console.log.bind(console);
 
+const Blocklist = require('./Blocklist');
+
 const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
 const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
 const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
@@ -12,6 +14,7 @@ const SelectionAggregator = require('./aggregators/SelectionAggregator');
 class Extractor
 {
 	constructor() {
+		this.blocklist = null;
 		this.browserPromise = null;
 		this.extractGroups = {};
 
@@ -28,11 +31,25 @@ class Extractor
 		);
 	}
 
+	async init() {
+		this.blocklist = new Blocklist();
+		await this.blocklist.loadHosts();
+	}
+
+	info() {
+		return {
+			puppeteer: {
+				executablePath: puppeteer.executablePath(),
+				defaultArgs: puppeteer.defaultArgs()
+			}
+		}
+	}
+
 	registerExtractGroup(name, extractors, aggregator) {
 		this.extractGroups[name] = {
 			extractors: extractors,
 			aggregator: aggregator
-		};
+		}
 	}
 
 	async configurePage(page) {
@@ -40,6 +57,20 @@ class Extractor
 
 		page.on('console', this.pageConsole);
 		page.on('pageerror', this.pageError);
+		page.on('request', request => {
+			let hostName = null,
+				rqParts = request.url().split('/');
+			if (rqParts.length > 2) {
+				hostName = rqParts[2];
+			}
+
+			if (hostName && this.blocklist.isHostInBlocklist(hostName)) {
+				request.abort();
+			}
+			else {
+				request.continue();
+			}
+		});
 		page.on('response', this.pageResponse);
 		page.on('requestfailed', this.pageRequestFailed);
 	}

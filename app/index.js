@@ -3,7 +3,6 @@
  */
 const Koa = require('koa');
 const Router = require('koa-router');
-const URI = require('urijs');
 const logger = require('koa-logger');
 const json = require('koa-json');
 const debug = require('debug')('http');
@@ -11,12 +10,12 @@ const debug = require('debug')('http');
 const app = new Koa();
 const router = new Router();
 
-
 /**
  * Do some scraping
  */
 const Extractor = require('./lib/Extractor');
 const extractor = new Extractor();
+extractor.init();
 
 router.get('/extract/:weburi', async (ctx, next) => {
 	let weburi = ctx.params.weburi;
@@ -30,6 +29,9 @@ router.get('/extract/:weburi', async (ctx, next) => {
 	};
 });
 
+router.get('/info', async (ctx, next) => {
+	ctx.body = xtract.info();
+});
 
 const koaLog = logger();
 app.use(async function (ctx, next) {
