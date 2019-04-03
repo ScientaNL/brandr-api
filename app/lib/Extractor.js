@@ -1,11 +1,11 @@
 const puppeteer = require('puppeteer');
 const debug = require('debug')('extractor');
-debug.log = console.log.bind(console);
 
+debug.log = console.log.bind(console);
 const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
 const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
-const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
 
+const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
 const LogoAggregator = require('./aggregators/LogoAggregator');
 const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
@@ -17,7 +17,7 @@ class Extractor
 
 		this.registerExtractGroup(
 			'logo',
-			[new DomLogoStrategy(), new MetaLogoStrategy()],
+			[new DomLogoStrategy()/*, new MetaLogoStrategy()*/],
 			new LogoAggregator()
 		);
 
@@ -66,10 +66,10 @@ class Extractor
 					await page.addScriptTag({path: filePath});
 				}
 
-				groupResult[extractor.getId()] = await extractor.handlePage(uri, page);
+				groupResult[extractor.getId()] = await extractor.handlePage(uri, page, root);
 			}
 
-			results[groupName] = group.aggregator.aggregate(groupResult);
+			results[groupName] = await group.aggregator.aggregate(groupResult);
 		}
 
 		await page.close();

@@ -3,6 +3,7 @@
  */
 const Koa = require('koa');
 const Router = require('koa-router');
+const serveStatic = require('koa-static');
 const URI = require('urijs');
 const logger = require('koa-logger');
 const json = require('koa-json');
@@ -10,7 +11,6 @@ const debug = require('debug')('http');
 
 const app = new Koa();
 const router = new Router();
-
 
 /**
  * Do some scraping
@@ -30,6 +30,14 @@ router.get('/extract/:weburi', async (ctx, next) => {
 	};
 });
 
+router.get('/download/:path', async (ctx, next) => {
+	let relPath = ctx.params.path;
+
+	ctx.body = {
+		uri: relPath
+	};
+});
+
 
 const koaLog = logger();
 app.use(async function (ctx, next) {
@@ -38,6 +46,8 @@ app.use(async function (ctx, next) {
 
 app.use(json());
 app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(serveStatic("/test"));
+
+// app.use(router.allowedMethods());
 
 app.listen(3000);

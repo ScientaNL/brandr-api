@@ -182,8 +182,14 @@ class DOMLogoStrategyParser {
 				continue;
 			}
 
+			let logoBoundingClientRect = logo.element.getBoundingClientRect();
+
 			logos.push({
 				logo: logo.data,
+				dimensions: {
+					width: logoBoundingClientRect.width,
+					height: logoBoundingClientRect.height
+				},
 				weight: logo.weight
 			});
 		}
