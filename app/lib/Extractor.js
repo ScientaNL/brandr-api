@@ -5,8 +5,8 @@ const Navigator = require('./Navigator');
 
 const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
 const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
-const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
 
+const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
 const LogoAggregator = require('./aggregators/LogoAggregator');
 const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
@@ -18,7 +18,7 @@ class Extractor
 
 		this.registerExtractGroup(
 			'logo',
-			[new DomLogoStrategy(), new MetaLogoStrategy()],
+			[new DomLogoStrategy()/*, new MetaLogoStrategy()*/],
 			new LogoAggregator()
 		);
 

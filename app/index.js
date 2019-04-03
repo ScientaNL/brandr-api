@@ -3,6 +3,7 @@
  */
 const Koa = require('koa');
 const Router = require('koa-router');
+const serveStatic = require('koa-static');
 const logger = require('koa-logger');
 const json = require('koa-json');
 const debug = require('debug')('http');
@@ -35,6 +36,14 @@ router.get('/info', async (ctx, next) => {
 	ctx.body = await extractor.getInfo();
 });
 
+router.get('/download/:path', async (ctx, next) => {
+	let relPath = ctx.params.path;
+
+	ctx.body = {
+		uri: relPath
+	};
+});
+
 const koaLog = logger();
 app.use(async function (ctx, next) {
 	return debug.enabled ? koaLog(ctx, next) : await next();
@@ -42,6 +51,8 @@ app.use(async function (ctx, next) {
 
 app.use(json());
 app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(serveStatic("/test"));
+
+// app.use(router.allowedMethods());
 
 app.listen(3000);

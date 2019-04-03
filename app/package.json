@@ -7,12 +7,18 @@
 	"author": "info@scienta.nl <info@scienta.nl>",
 	"private": true,
 	"dependencies": {
+		"better-queue": "^3.8.10",
 		"debug": "^3.1.0",
+		"hasha": "^4.0.1",
+		"image-size": "^0.7.3",
+		"image-type": "^4.0.0",
+		"is-svg": "^4.0.0",
 		"koa": "^2.4.1",
 		"koa-json": "^2.0.2",
 		"koa-logger": "^3.1.0",
 		"koa-router": "^7.3.0",
-		"urijs": "^1.19.0",
-		"better-queue": "^3.8.10"
+		"koa-static": "^5.0.0",
+		"node-fetch": "^2.3.0",
+		"urijs": "^1.19.0"
 	}
 }
