@@ -101,9 +101,9 @@ class MetaLogoStrategyParser {
 
 				let result = extractors[iq.extractor](node);
 
-				if (result !== null && typeof result === 'object'){
+				if (result !== null && typeof result === 'object') {
 					result. weight = iq.weight;
-					matches.push(result)
+					matches.push(result);
 				} else if (result !== null && result !== undefined) {
 					matches.push({src: makeUrlAbsolute(result), weight: iq.weight});
 				}
@@ -126,10 +126,8 @@ class MetaLogoStrategyParser {
 		// remove duplicate sub-strategies
 		let distinctMatches = Array.from(new Set(matches.map(JSON.stringify))).map(JSON.parse);
 
-		return {
-			matches: distinctMatches.sort((a, b) => {
-				return b.weight - a.weight;
-			})
-		}
+		return distinctMatches.sort((a, b) => {
+			return b.weight - a.weight;
+		});
 	}
 }
