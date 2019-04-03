@@ -3,7 +3,7 @@ const path = require('path');
 class AbstractStrategy
 {
 	getId() {
-		return undefined;
+		throw new Error(`Please implement getId method in strategy`);
 	}
 
 	async handlePage(uri, page) {

@@ -2,22 +2,30 @@ const puppeteer = require('puppeteer');
 const debug = require('debug')('extractor');
 debug.log = console.log.bind(console);
 
-const MetaLogoStrategy = require('./strategy/meta-logo/MetaLogoStrategy');
-const StyleColorsStrategy = require('./strategy/style-colors/StyleColorsStrategy');
-const DomLogoStrategy = require('./strategy/dom-logo/DomLogoStrategy');
+const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
+const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
+const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
+
+const LogoAggregator = require('./aggregators/LogoAggregator');
+const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
 class Extractor
 {
 	constructor() {
-		this.strategies = [];
-		this.extractGroups = {};
 		this.browserPromise = null;
+		this.extractGroups = {};
 
-		this.registerExtractGroup('logo', [
-			new DomLogoStrategy(), new MetaLogoStrategy()
-		], (a) => {return a});
+		this.registerExtractGroup(
+			'logo',
+			[new DomLogoStrategy(), new MetaLogoStrategy()],
+			new LogoAggregator()
+		);
 
-		this.registerExtractGroup('color', [new StyleColorsStrategy()], (a) => {return a.getColors});
+		this.registerExtractGroup(
+			'color',
+			[new StyleColorsStrategy()],
+			new SelectionAggregator(["style-colors"])
+		);
 	}
 
 	registerExtractGroup(name, extractors, aggregator) {
@@ -25,10 +33,6 @@ class Extractor
 			extractors: extractors,
 			aggregator: aggregator
 		};
-	}
-
-	registerStrategy(strategyInstance) {
-		this.strategies.push(strategyInstance);
 	}
 
 	async configurePage(page) {
@@ -65,7 +69,7 @@ class Extractor
 				groupResult[extractor.getId()] = await extractor.handlePage(uri, page);
 			}
 
-			results[groupName] = group.aggregator(groupResult);
+			results[groupName] = group.aggregator.aggregate(groupResult);
 		}
 
 		await page.close();
