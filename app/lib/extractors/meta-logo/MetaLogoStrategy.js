@@ -34,12 +34,15 @@ class MetaLogoStrategy extends AbstractStrategy
 			meta: [],
 			sub: {}
 		};
-		for (const match in parserResult) {
-			if (typeof match !== 'object') {
-				result.match = match;
-			} else if (match.strategy && this.subStrategies[match.strategy]) {
+
+		for (const match of parserResult) {
+			if (match.strategy && this.subStrategies[match.strategy]) {
 				let subStrategy = this.subStrategies[match.strategy];
-				result.sub[subStrategy.getId()] = await newPageExtractor(match.url, [subStrategy]);
+				let subId = subStrategy.getId();
+				let res = await newPageExtractor(match.url, [subStrategy]);
+				result.sub[subId] = res[subId];
+			} else {
+				result.meta = match;
 			}
 		}
 		return result;

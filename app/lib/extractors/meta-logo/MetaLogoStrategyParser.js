@@ -17,7 +17,11 @@ class MetaLogoStrategyParser {
 				return JSON.parse(node.innerHTML).logo;
 			},
 			'twitter': (node) => {
-				let twitterUrl = 'https://twitter.com/' + node.getAttribute('content');
+				let path = node.getAttribute('content');
+				if (path[0] === '@') {
+					path = path.substring(1);
+				}
+				let twitterUrl = 'https://twitter.com/' + path;
 				return {strategy: 'twitter-logo', url: twitterUrl};
 			},
 			'facebook': (node) => {
@@ -102,7 +106,7 @@ class MetaLogoStrategyParser {
 				let result = extractors[iq.extractor](node);
 
 				if (result !== null && typeof result === 'object') {
-					result. weight = iq.weight;
+					result.weight = iq.weight;
 					matches.push(result);
 				} else if (result !== null && result !== undefined) {
 					matches.push({src: makeUrlAbsolute(result), weight: iq.weight});

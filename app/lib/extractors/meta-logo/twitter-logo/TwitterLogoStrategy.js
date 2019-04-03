@@ -15,13 +15,9 @@ class TwitterLogoStrategy extends AbstractStrategy
 	 * @returns {Array}
 	 */
 	parsePage () {
-		let parser = new FacebookLogoStrategyParser(document);
+		let parser = new TwitterLogoStrategyParser(document);
 		return parser.parse();
 	};
-
-	async processParserResult(parserResult) {
-		return parserResult.matches;
-	}
 }
 
 module.exports = TwitterLogoStrategy;

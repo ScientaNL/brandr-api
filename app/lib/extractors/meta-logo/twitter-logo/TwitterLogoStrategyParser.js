@@ -11,9 +11,7 @@ class TwitterLogoStrategyParser {
 		if (node !== undefined) {
 			src = node.getAttribute('src'); // a > div > img
 
-			return {
-				matches: [{src: src, type: 'twitter-logo'}]
-			};
+			return [{src: src, type: 'twitter-logo'}];
 		}
 
 		return null;
