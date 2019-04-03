@@ -5,12 +5,13 @@ services:
     image: scienta/logo-extractor:master
     volumes:
       - ./app:/app
-      - ./test:/output
+      - ./output:/output
       - ./app/node_modules:/app/node_modules
+      - /app/resources/hosts-blocklist
     ports:
       - "${BIND_INTERFACE}:1337:3000"
     environment:
       - NODE_ENV=dev
       - APP_HOST=http://${BIND_INTERFACE}:1337
-      - DEBUG=*,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
+      - DEBUG=*,-navigator:info,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
     command: nodemon /app/index.js

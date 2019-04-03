@@ -1,7 +1,8 @@
-const puppeteer = require('puppeteer');
 const debug = require('debug')('extractor');
-
 debug.log = console.log.bind(console);
+
+const Navigator = require('./Navigator');
+
 const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
 const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
 
@@ -12,8 +13,8 @@ const SelectionAggregator = require('./aggregators/SelectionAggregator');
 class Extractor
 {
 	constructor(storagePath, host) {
-		this.browserPromise = null;
 		this.extractGroups = {};
+		this.navigator = new Navigator();
 
 		this.registerExtractGroup(
 			'logo',
@@ -28,84 +29,73 @@ class Extractor
 		);
 	}
 
+	async init(settings) {
+		if (settings.useBlockList) {
+			this.navigator.initBlockList();
+		}
+	}
+
+	async getInfo() {
+		let navInfo = await this.navigator.getInfo();
+		return {
+			puppeteer: navInfo
+		}
+	}
+
 	registerExtractGroup(name, extractors, aggregator) {
 		this.extractGroups[name] = {
 			extractors: extractors,
 			aggregator: aggregator
-		};
+		}
 	}
 
-	async configurePage(page) {
-		await page.setBypassCSP(true);
-
-		// page.on('console', this.pageConsole);
-		// page.on('pageerror', this.pageError);
-		// page.on('response', this.pageResponse);
-		// page.on('requestfailed', this.pageRequestFailed);
-	}
-
-	async runStrategies(uri) {
-		const browser = await this.getBrowser();
-
-		const page = await browser.newPage();
-		await this.configurePage(page);
-
-		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
+	async extract(uri) {
+		const page = await this.navigator.newPage(uri);
 
 		let results = {};
 		for (let groupName in this.extractGroups) {
-			if(this.extractGroups.hasOwnProperty(groupName) === false) {
+			if (this.extractGroups.hasOwnProperty(groupName) === false) {
 				continue;
 			}
 
 			let group = this.extractGroups[groupName];
-			let groupResult = {};
-
-			for(let extractor of group.extractors) {
-				for (let filePath of extractor.getParserFilesToInject()) {
-					await page.addScriptTag({path: filePath});
-				}
-
-				groupResult[extractor.getId()] = await extractor.handlePage(uri, page);
-			}
-
-			results[groupName] = await group.aggregator.aggregate(groupResult);
+			results[groupName] = await group.aggregator.aggregate(
+				await this.runExtractors(group.extractors, page, uri)
+			);
 		}
 
-		await page.close();
+		if (!page.isClosed()) {
+			await page.close();
+		}
 
 		return results;
 	}
 
-	async getBrowser()
-	{
-		if(this.browserPromise) {
-			return this.browserPromise;
+	async extractNewPage(uri, extractors) {
+		const page = await this.navigator.newPage(uri);
+
+		let result = await this.runExtractors(extractors, page, uri);
+
+		if (!page.isClosed()) {
+			await page.close();
 		}
 
-		return this.browserPromise = puppeteer.launch({
-			args: ['--no-sandbox'],
-			defaultViewport: {
-				width: 1920,
-				height: 1080
+		return result;
+	}
+
+	async runExtractors(extractors, page, uri) {
+		let result = {},
+			newPageExtractor = async (uri, extractors) => {
+				return await this.extractNewPage(uri, extractors)
+			};
+
+		for (let extractor of extractors) {
+			for (let filePath of extractor.getParserFilesToInject()) {
+				await page.addScriptTag({path: filePath});
 			}
-		});
-	}
-
-	pageConsole(msg) {
-		debug('page-console:', msg.text());
-	}
-
-	pageError(error) {
-		debug('page-error:', error.message);
-	}
-
-	pageResponse(response) {
-		debug('page-response:', response.status(), response.url());
-	}
-
-	pageRequestFailed(request) {
-		debug('page-requestfailed:', request.failure().errorText, request.url());
+			result[extractor.getId()] = await extractor.handlePage(uri, page, newPageExtractor);
+		}
+		return result;
 	}
 }
 
