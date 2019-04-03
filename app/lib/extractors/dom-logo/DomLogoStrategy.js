@@ -91,7 +91,7 @@ class DomLogoStrategy extends AbstractStrategy
 		return result;
 	}
 
-	async parseSvg(svg, root) {
+	async parseSvg(svg) {
 		let buffer = Buffer.from(svg);
 
 		if(isSvg(buffer) === true) {

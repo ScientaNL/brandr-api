@@ -12,14 +12,14 @@ const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
 class Extractor
 {
-	constructor() {
+	constructor(storagePath, host) {
 		this.extractGroups = {};
 		this.navigator = new Navigator();
 
 		this.registerExtractGroup(
 			'logo',
 			[new DomLogoStrategy(), new MetaLogoStrategy()],
-			new LogoAggregator()
+			new LogoAggregator(storagePath, host)
 		);
 
 		this.registerExtractGroup(
