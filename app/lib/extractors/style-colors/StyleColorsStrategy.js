@@ -3,7 +3,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 class StyleColorsStrategy extends AbstractStrategy
 {
 	getId() {
-		return 'getColors';
+		return 'style-colors';
 	}
 
 	getParserFilesToInject() {
