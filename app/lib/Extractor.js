@@ -11,14 +11,14 @@ const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
 class Extractor
 {
-	constructor() {
+	constructor(storagePath, host) {
 		this.browserPromise = null;
 		this.extractGroups = {};
 
 		this.registerExtractGroup(
 			'logo',
 			[new DomLogoStrategy(), new MetaLogoStrategy()],
-			new LogoAggregator()
+			new LogoAggregator(storagePath, host)
 		);
 
 		this.registerExtractGroup(
@@ -38,10 +38,10 @@ class Extractor
 	async configurePage(page) {
 		await page.setBypassCSP(true);
 
-		page.on('console', this.pageConsole);
-		page.on('pageerror', this.pageError);
-		page.on('response', this.pageResponse);
-		page.on('requestfailed', this.pageRequestFailed);
+		// page.on('console', this.pageConsole);
+		// page.on('pageerror', this.pageError);
+		// page.on('response', this.pageResponse);
+		// page.on('requestfailed', this.pageRequestFailed);
 	}
 
 	async runStrategies(uri) {

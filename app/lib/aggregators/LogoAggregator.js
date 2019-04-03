@@ -3,8 +3,9 @@ const fs = require('fs');
 
 class LogoAggregator {
 
-	constructor() {
-
+	constructor(storagePath, host) {
+		this.storagePath = storagePath;
+		this.host = host;
 	}
 
 	async aggregate(data) {
@@ -16,10 +17,11 @@ class LogoAggregator {
 		let logo = data['dom-logo'][0];
 
 		let hash = hasha(logo.buffer, {algorithm: 'md5'});
-		let filename =  `${hash}.${logo.extension}`;
-		await fs.promises.writeFile(`/test/${filename}`, logo.buffer);
+		let filename = `${hash}.${logo.extension}`;
 
-		return `http://10.10.11.231:1337/${filename}`;
+		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.buffer);
+
+		return `${this.host}/${filename}`;
 	}
 }
 
