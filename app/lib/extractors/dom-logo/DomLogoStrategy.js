@@ -27,7 +27,7 @@ class DomLogoStrategy extends AbstractStrategy
 		let image = [];
 		for(let logo of parserResult) {
 			try {
-				let buffer = await this.downloadLogo(logo, root);
+				let buffer = await this.downloadLogo(logo);
 
 				if(buffer) {
 					image.push(buffer);
