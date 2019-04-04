@@ -45,6 +45,7 @@ class DomLogoStrategy extends AbstractStrategy
 
 	async downloadLogo(logo) {
 
+		console.log(logo);
 		switch(logo.logo.type) {
 			case "file":
 				return this.downloadFile(logo.logo.src);
