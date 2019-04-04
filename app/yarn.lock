@@ -107,6 +107,21 @@ debug@~3.1.0:
   dependencies:
     ms "2.0.0"
 
+decode-bmp@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/decode-bmp/-/decode-bmp-0.1.0.tgz#a7a0ad133dcdc717a437132e86fd91124254d090"
+  integrity sha512-i7ImaOawHIwQNIt3IpO8X04ZRGI4A7gqX3vPw5aMIqMwsAk5xs/pnWLKmXc97nII5rSGJB9QyauO5FwctFiYoQ==
+  dependencies:
+    to-data-view "^1.0.0"
+
+decode-ico@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/decode-ico/-/decode-ico-0.3.1.tgz#8ef97be1c8507761a8e14c5b5c732b29d4c102a2"
+  integrity sha512-Ejv981YSYeAVyebE+g/Z/3hhE9wLE0uOBmiglqnhRfVMbLu1mf0CCesOoFWjdDqDYBOWIYLHJ6+uQxjlID3FEg==
+  dependencies:
+    decode-bmp "^0.1.0"
+    to-data-view "^1.0.0"
+
 deep-equal@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
@@ -548,6 +563,11 @@ thenify-all@^1.0.0:
   integrity sha1-5p44obq+lpsBCCB5eLn2K4hgSDk=
   dependencies:
     any-promise "^1.0.0"
+
+to-data-view@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/to-data-view/-/to-data-view-1.0.0.tgz#4980623719ccb6a2232ae6d82d9ffd0a2e2e39fd"
+  integrity sha512-pz/bdULSupr+shtVLFHRBXstHfeBByfT9oa1oVOMBR4FWJkuFuD/OFdXZkR8sWONbtfKO7m3Tin/tKM+k3Qt8Q==
 
 toidentifier@1.0.0:
   version "1.0.0"
