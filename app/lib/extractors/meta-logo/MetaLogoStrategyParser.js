@@ -1,10 +1,4 @@
-class MetaLogoStrategyParser {
-	document;
-
-	constructor(document) {
-		this.document = document;
-	}
-
+class MetaLogoStrategyParser extends AbstractMetaExtractorParser {
 	getExtractors() {
 		return {
 			'meta': (node) => {
@@ -15,20 +9,6 @@ class MetaLogoStrategyParser {
 			},
 			'json': (node) => {
 				return JSON.parse(node.innerHTML).logo;
-			},
-			'twitter': (node) => {
-				let path = node.getAttribute('content');
-				if (path[0] === '@') {
-					path = path.substring(1);
-				}
-				let twitterUrl = 'https://twitter.com/' + path;
-				return {strategy: 'twitter-logo', url: twitterUrl};
-			},
-			'facebook': (node) => {
-				// if multiple: take first only 131666743524308,131666743524308
-				let id = node.getAttribute('content').split(',')[0],
-					fbUrl = 'https://fb.com/' + id;
-				return {strategy: 'facebook-logo', url: fbUrl};
 			}
 		};
 	}
@@ -53,23 +33,9 @@ class MetaLogoStrategyParser {
 			{type: 'link/rel=apple-touch-icon', query: 'link[rel="apple-touch-icon"]', weight: 1.5, extractor: 'link'},
 			{type: 'link/rel=apple-touch-icon-precomposed', query: 'link[rel="apple-touch-icon-precomposed"]', weight: 1.5, extractor: 'link'},
 			{type: 'link/rel=mask-icon', query: 'link[rel="mask-icon"]', weight: 1.5, extractor: 'link'},
-			{type: 'meta/property=twitter:image', query: 'meta[property="twitter:image"]', weight: 1, extractor: 'meta'},
-			{type: 'meta/name=twitter:image', query: 'meta[name="twitter:image"]', weight: 1, extractor: 'meta'},
-
-			// socials
-			{type: 'meta/name=twitter:creator', query: 'meta[name^="twitter:creator"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/property=twitter:creator', query: 'meta[property^="twitter:creator"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/name=twitter:site', query: 'meta[name^="twitter:site"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/property=twitter:site', query: 'meta[property^="twitter:site"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/name=twitter:account_id', query: 'meta[name="twitter:account_id"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/property=twitter:account_id', query: 'meta[property="twitter:account_id"]', weight: 1.5, extractor: 'twitter'},
-			{type: 'meta/name=fb:page_id', query: 'meta[name="fb:page_id"]', weight: 1.5, extractor: 'facebook'},
-			{type: 'meta/property=fb:page_id', query: 'meta[property="fb:page_id"]', weight: 1.5, extractor: 'facebook'},
-			{type: 'meta/name=fb:pages', query: 'meta[name="fb:pages"]', weight: 1.5, extractor: 'facebook'},
-			{type: 'meta/property=fb:pages', query: 'meta[property="fb:pages"]', weight: 1.5, extractor: 'facebook'},
 
 			// json ld
-			{type: 'script/type=json', query: 'script[type="application/ld+json"]', weight: 2, extractor: 'json'}
+			// {type: 'script/type=json', query: 'script[type="application/ld+json"]', weight: 2, extractor: 'json'}
 		];
 	}
 
@@ -82,56 +48,5 @@ class MetaLogoStrategyParser {
 			{name: 'isFavicon', regex: /(favicon|\.ico)/i, force: .25},
 			{name: 'containsWordBanner', regex: /banner/i, force: .25}
 		];
-	}
-
-	parse() {
-
-		let matches = [];
-		let queries = this.getQueries();
-		let extractors = this.getExtractors();
-		let refiners = this.getRefiners();
-		let makeUrlAbsolute = (url) => {
-			var tempImg = document.createElement("img");
-			tempImg.src = url;
-			return tempImg.src;
-		};
-
-		// collect matches
-		queries.forEach((iq) => {
-
-			let nodes = document.querySelectorAll(iq.query);
-
-			nodes.forEach(async (node) => {
-
-				let result = extractors[iq.extractor](node);
-
-				if (result !== null && typeof result === 'object') {
-					result.weight = iq.weight;
-					matches.push(result);
-				} else if (result !== null && result !== undefined) {
-					matches.push({src: makeUrlAbsolute(result), weight: iq.weight});
-				}
-
-			});
-		});
-
-
-		// refine weight
-		matches.forEach((match) => {
-
-			refiners.forEach((adjuster) => {
-
-				if (match.src && match.src.match(adjuster.regex)) {
-					match.weight *= adjuster.force;
-				}
-			});
-		});
-
-		// remove duplicate sub-strategies
-		let distinctMatches = Array.from(new Set(matches.map(JSON.stringify))).map(JSON.parse);
-
-		return distinctMatches.sort((a, b) => {
-			return b.weight - a.weight;
-		});
 	}
 }

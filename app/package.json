@@ -9,6 +9,7 @@
 	"dependencies": {
 		"better-queue": "^3.8.10",
 		"debug": "^3.1.0",
+		"decode-ico": "^0.3.1",
 		"hasha": "^4.0.1",
 		"image-size": "^0.7.3",
 		"image-type": "^4.0.0",

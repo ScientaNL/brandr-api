@@ -1,15 +1,15 @@
 const AbstractStrategy = require('../AbstractStrategy');
 
-class MetaLogoStrategy extends AbstractStrategy
+class FacebookLogoStrategy extends AbstractStrategy
 {
 	getId() {
-		return 'meta-logo';
+		return 'facebook-logo';
 	}
 
 	getParserFilesToInject() {
 		return [
 			__dirname + "/../AbstractMetaExtractorParser.js",
-			__dirname + "/MetaLogoStrategyParser.js"
+			__dirname + "/FacebookLogoStrategyParser.js"
 		];
 	}
 
@@ -18,19 +18,22 @@ class MetaLogoStrategy extends AbstractStrategy
 	 * @returns {Array}
 	 */
 	parsePage () {
-		let parser = new MetaLogoStrategyParser(document);
+		let parser = new FacebookLogoStrategyParser(document);
 		return parser.parse();
-	};
+	}
 
 	async processParserResult(parserResult) {
 
 		let images = [];
 		for(let result of parserResult) {
-			if(!result.src) {
+			if(!result.id) {
 				continue;
 			}
 
-			let definition = await this.processDownload(result.src,	result.weight);
+			let definition = await this.processDownload(
+				`https://graph.facebook.com/${result.id}/picture?type=large`,
+				result.weight
+			);
 
 			if(definition) {
 				images.push((definition));
@@ -41,4 +44,4 @@ class MetaLogoStrategy extends AbstractStrategy
 	}
 }
 
-module.exports = MetaLogoStrategy;
+module.exports = FacebookLogoStrategy;
