@@ -9,10 +9,13 @@ class LogoAggregator {
 	}
 
 	async aggregate(data) {
-		if (data['dom-logo']) {
-			data['dom-logo'] = await this.aggregateDomLogo(data['dom-logo']);
+
+		let result = {};
+		for(let strategy in data) {
+			result[strategy] = await this.aggregateDomLogo(data[strategy]);
 		}
-		return data;
+		
+		return result;
 	}
 
 	async aggregateDomLogo(data) {
@@ -20,14 +23,13 @@ class LogoAggregator {
 			return null;
 		}
 
-
 		//For testing Use one logo to test with
 		let logo = data[0];
 
-		let hash = hasha(logo.logo.buffer, {algorithm: 'md5'});
-		let filename = `${hash}.${logo.logo.extension}`;
+		let hash = hasha(logo.buffer, {algorithm: 'md5'});
+		let filename = `${hash}.${logo.extension}`;
 
-		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.logo.buffer);
+		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.buffer);
 
 		return `${this.host}/${filename}`;
 	}

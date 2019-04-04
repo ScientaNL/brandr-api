@@ -3,10 +3,16 @@ debug.log = console.log.bind(console);
 
 const Navigator = require('./Navigator');
 
+const path = require("path");
+
 const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
 const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
 
 const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
+const FacebookLogoStrategy = require('./extractors/facebook-logo/FacebookLogoStrategy');
+const TwitterLogoStrategy = require('./extractors/twitter-logo/TwitterLogoStrategy');
+
+
 const LogoAggregator = require('./aggregators/LogoAggregator');
 const SelectionAggregator = require('./aggregators/SelectionAggregator');
 
@@ -18,7 +24,7 @@ class Extractor
 
 		this.registerExtractGroup(
 			'logo',
-			[new DomLogoStrategy(), new MetaLogoStrategy()],
+			[new DomLogoStrategy(), new MetaLogoStrategy(), new FacebookLogoStrategy(), new TwitterLogoStrategy()],
 			new LogoAggregator(storagePath, host)
 		);
 
@@ -95,10 +101,17 @@ class Extractor
 				return await this.extractNewPage(uri, extractors)
 			};
 
+		let injectedScripts = [];
 		for (let extractor of extractors) {
 			for (let filePath of extractor.getParserFilesToInject()) {
-				await page.addScriptTag({path: filePath});
+				filePath = path.resolve(filePath);
+				
+				if(injectedScripts.indexOf(filePath) === -1) {
+					await page.addScriptTag({path: filePath});
+					injectedScripts.push(filePath);
+				}
 			}
+
 			result[extractor.getId()] = await extractor.handlePage(uri, page, newPageExtractor);
 		}
 		return result;
