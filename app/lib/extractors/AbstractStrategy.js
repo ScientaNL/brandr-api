@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const imageType = require('image-type');
 const isSvg = require('is-svg');
+const icoToPng = require('ico-to-png');
 
 class AbstractStrategy
 {
@@ -45,8 +46,6 @@ class AbstractStrategy
 			result.origin = src;
 		}
 
-		// console.log(src);
-
 		const imageInfo = imageType(result.buffer);
 
 		if(imageInfo) {
@@ -55,6 +54,16 @@ class AbstractStrategy
 				case "png":
 				case "gif":
 					result.extension = imageInfo.ext;
+					break;
+				case"ico":
+					let pngBuffer = await this.parseIco(result.buffer, src);
+
+					if(pngBuffer === null) {
+						return null;
+					}
+
+					result.buffer = pngBuffer;
+					result.extension = "png";
 					break;
 				default:
 					return null;
@@ -78,6 +87,19 @@ class AbstractStrategy
 				origin: "[inline]"
 			};
 		} else {
+			return null;
+		}
+	}
+
+	async parseIco(icoBuffer) {
+		try {
+			let pngBuffer = await icoToPng(icoBuffer, 1024);
+			let imageInfo = imageType(pngBuffer);
+
+			return (imageInfo.ext === "png") ? pngBuffer : null;
+		} catch(e) {
+			console.log(e);
+
 			return null;
 		}
 	}
