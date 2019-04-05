@@ -1,8 +1,8 @@
 version: '3'
 services:
   node:
-    container_name: logo-extractor
-    image: scienta/logo-extractor:master
+    container_name: brandr-api
+    image: scienta/brandr-api:master
     volumes:
       - ./app:/app
       - ./output:/output
