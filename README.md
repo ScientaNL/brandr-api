@@ -1,2 +1,2 @@
-# logo-extractor
-Logo extractor
+# brandr.app api
+brandr.app API
