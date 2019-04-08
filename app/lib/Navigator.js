@@ -9,7 +9,8 @@ class Navigator
 		this.blocklist = null;
 		this.browserPromise = null;
 		this.defaultPuppeteerOptions = {
-			args: ['--no-sandbox'],
+			executablePath: 'google-chrome-unstable',
+			args: ['--no-sandbox', '--disable-dev-shm-usage'],
 			defaultViewport: {
 				width: 1920,
 				height: 1080
