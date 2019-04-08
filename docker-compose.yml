@@ -2,7 +2,7 @@ version: '3'
 services:
   node:
     container_name: brandr-api
-    image: scienta/brandr-api:master
+    image: scienta/brandr-api:branch-master
     volumes:
       - ./app:/app
       - ./output:/output

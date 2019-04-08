@@ -12,27 +12,74 @@ const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
 const FacebookLogoStrategy = require('./extractors/facebook-logo/FacebookLogoStrategy');
 const TwitterLogoStrategy = require('./extractors/twitter-logo/TwitterLogoStrategy');
 
-
-const LogoAggregator = require('./aggregators/LogoAggregator');
-const SelectionAggregator = require('./aggregators/SelectionAggregator');
+const Pipeline = require('./pipeline/Pipeline');
+const ArrayMerger = require('./pipeline/ArrayMerger');
+const ArrayWeighSort = require('./pipeline/ArrayWeighSort');
+const ArrayUnique = require('./pipeline/ArrayUnique');
+const BestLogoMatchAggregator = require('./pipeline/BestLogoMatchAggregator');
+const NthIndex = require('./pipeline/NthIndex');
 
 class Extractor
 {
 	constructor(storagePath, host) {
-		this.extractGroups = {};
+		this.extractors = {};
+		this.pipelines = [];
 		this.navigator = new Navigator();
 
-		this.registerExtractGroup(
-			'logo',
-			[new DomLogoStrategy(), new MetaLogoStrategy(), new FacebookLogoStrategy(), new TwitterLogoStrategy()],
-			new LogoAggregator(storagePath, host)
-		);
+		this.registerExtractor(new DomLogoStrategy());
+		this.registerExtractor(new MetaLogoStrategy());
+		this.registerExtractor(new FacebookLogoStrategy());
+		this.registerExtractor(new TwitterLogoStrategy());
 
-		this.registerExtractGroup(
-			'color',
-			[new StyleColorsStrategy()],
-			new SelectionAggregator(["style-colors"])
-		);
+		this.registerExtractor(new StyleColorsStrategy());
+
+		this.registerPipeline(new Pipeline('logo', [
+			new ArrayMerger([
+				DomLogoStrategy.getId(),
+				MetaLogoStrategy.getId(),
+				FacebookLogoStrategy.getId(),
+				TwitterLogoStrategy.getId()
+			]),
+			new ArrayWeighSort(),
+			new ArrayUnique(),
+			new BestLogoMatchAggregator(3, storagePath, host),
+		]));
+
+		this.registerPipeline(new Pipeline('dom-logo', [
+			new ArrayMerger([DomLogoStrategy.getId()]),
+			new ArrayWeighSort(),
+			new ArrayUnique(),
+			new BestLogoMatchAggregator(1, storagePath, host),
+			new NthIndex(0)
+		]));
+
+		this.registerPipeline(new Pipeline('social-logo', [
+			new ArrayMerger([FacebookLogoStrategy.getId(), TwitterLogoStrategy.getId()]),
+			new ArrayWeighSort(),
+			new ArrayUnique(),
+			new BestLogoMatchAggregator(1, storagePath, host),
+			new NthIndex(0)
+		]));
+
+		this.registerPipeline(new Pipeline('meta-logo', [
+			new ArrayMerger([MetaLogoStrategy.getId()]),
+			new ArrayWeighSort(),
+			new ArrayUnique(),
+			new BestLogoMatchAggregator(1, storagePath, host),
+			new NthIndex(0)
+		]));
+
+		this.registerPipeline(new Pipeline('site-style', [
+			new ArrayMerger([StyleColorsStrategy.getId()])
+		]));
+	}
+
+	registerExtractor(extractor) {
+		this.extractors[extractor.constructor.getId()] = extractor;
+	}
+
+	registerPipeline(pipeline) {
+		this.pipelines.push(pipeline);
 	}
 
 	async init(settings) {
@@ -48,73 +95,52 @@ class Extractor
 		}
 	}
 
-	registerExtractGroup(name, extractors, aggregator) {
-		this.extractGroups[name] = {
-			extractors: extractors,
-			aggregator: aggregator
-		}
-	}
-
 	async extract(uri) {
 		debug('extracting:', uri);
 		const page = await this.navigator.newPage(uri);
 
-		let results = {};
-		for (let groupName in this.extractGroups) {
-			if (this.extractGroups.hasOwnProperty(groupName) === false) {
-				continue;
-			}
-
-			let group = this.extractGroups[groupName];
-			results[groupName] = await group.aggregator.aggregate(
-				await this.runExtractors(group.extractors, page, uri)
-			);
-		}
+		console.time("extractors");
+		let extractions = await this.runExtractors(page);
+		console.timeEnd("extractors");
 
 		if (!page.isClosed()) {
 			await page.close();
 		}
+
+		console.time("pipelines");
+		let results = {};
+		for(let pipeline of this.pipelines) {
+			let pipelineResult = await pipeline.process(extractions);
+			results = {...results, ...pipelineResult};
+		}
+		console.timeEnd("pipelines");
 
 		return results;
 	}
 
-	async extractNewPage(uri, extractors) {
-		if (!uri || extractors.length < 1) {
-			return null;
-		}
+	async runExtractors(page) {
 
-		debug('sub-extracting:', uri);
-		const page = await this.navigator.newPage(uri);
-
-		let result = await this.runExtractors(extractors, page, uri);
-
-		if (!page.isClosed()) {
-			await page.close();
-		}
-
-		return result;
-	}
-
-	async runExtractors(extractors, page, uri) {
-		let result = {},
-			newPageExtractor = async (uri, extractors) => {
-				return await this.extractNewPage(uri, extractors)
-			};
-
-		let injectedScripts = [];
-		for (let extractor of extractors) {
-			for (let filePath of extractor.getParserFilesToInject()) {
-				filePath = path.resolve(filePath);
-				
-				if(injectedScripts.indexOf(filePath) === -1) {
-					await page.addScriptTag({path: filePath});
-					injectedScripts.push(filePath);
-				}
+		let results = {};
+		let addedScripts = [];
+		for (let groupName in this.extractors) {
+			if (this.extractors.hasOwnProperty(groupName) === false) {
+				continue;
 			}
 
-			result[extractor.getId()] = await extractor.handlePage(uri, page, newPageExtractor);
+			let extractor = this.extractors[groupName];
+
+			for (let filePath of extractor.getParserFilesToInject()) {
+				filePath = path.resolve(filePath);
+
+				if(addedScripts.indexOf(filePath) === -1) {
+					await page.addScriptTag({path: filePath});
+					addedScripts.push(filePath);
+				}
+			}
+			results[groupName] = await extractor.handlePage(page);
 		}
-		return result;
+
+		return results;
 	}
 }
 

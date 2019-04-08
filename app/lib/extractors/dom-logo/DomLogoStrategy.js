@@ -2,7 +2,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 
 class DomLogoStrategy extends AbstractStrategy
 {
-	getId() {
+	static getId() {
 		return 'dom-logo';
 	}
 
@@ -24,19 +24,21 @@ class DomLogoStrategy extends AbstractStrategy
 		let images = [];
 		for(let logo of parserResult) {
 			try {
-				let imgDefinition = await this.downloadLogo(logo);
+				let imageDefinition = await this.downloadLogo(logo);
 
-				if(imgDefinition) {
+				if(imageDefinition) {
+					let weight = this.weighLogo(logo, imageDefinition);
 
 					images.push({
-						buffer: imgDefinition.buffer,
-						extension: imgDefinition.extension,
-						weight: logo.weight,
-						origin: imgDefinition.origin
+						buffer: imageDefinition.buffer,
+						hash: this.getBufferHash(imageDefinition.buffer),
+						extension: imageDefinition.extension,
+						weight: weight,
+						origin: imageDefinition.origin
 					});
 				}
 			} catch(e) {
-				console.log(e);
+				console.error(e);
 			}
 		}
 
@@ -45,13 +47,23 @@ class DomLogoStrategy extends AbstractStrategy
 
 	async downloadLogo(logo) {
 
-		console.log(logo);
 		switch(logo.logo.type) {
 			case "file":
 				return this.downloadFile(logo.logo.src);
 			case "svg":
 				return this.parseSvg(logo.logo.svg);
 		}
+	}
+
+	weighLogo(logo, imageDefinition) {
+
+		let weight = logo.weight;
+
+		if(imageDefinition.extension === "svg") {
+			weight *= 1.3;
+		}
+
+		return weight;
 	}
 }
 

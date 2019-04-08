@@ -2,7 +2,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 
 class StyleColorsStrategy extends AbstractStrategy
 {
-	getId() {
+	static getId() {
 		return 'style-colors';
 	}
 
