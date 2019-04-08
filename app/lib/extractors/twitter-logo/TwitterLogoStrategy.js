@@ -1,15 +1,15 @@
 const AbstractStrategy = require('../AbstractStrategy');
 
-class MetaLogoStrategy extends AbstractStrategy
+class TwitterLogoStrategy extends AbstractStrategy
 {
 	getId() {
-		return 'meta-logo';
+		return 'twitter-logo';
 	}
 
 	getParserFilesToInject() {
 		return [
 			__dirname + "/../AbstractMetaExtractorParser.js",
-			__dirname + "/MetaLogoStrategyParser.js"
+			__dirname + "/TwitterLogoStrategyParser.js"
 		];
 	}
 
@@ -18,7 +18,7 @@ class MetaLogoStrategy extends AbstractStrategy
 	 * @returns {Array}
 	 */
 	parsePage () {
-		let parser = new MetaLogoStrategyParser(document);
+		let parser = new TwitterLogoStrategyParser(document);
 		return parser.parse();
 	};
 
@@ -26,11 +26,14 @@ class MetaLogoStrategy extends AbstractStrategy
 
 		let images = [];
 		for(let result of parserResult) {
-			if(!result.src) {
+			if(!result.id) {
 				continue;
 			}
 
-			let definition = await this.processDownload(result.src,	result.weight);
+			let definition = await this.processDownload(
+				`https://twitter.com/${result.id}/profile_image?size=original`,
+				result.weight
+			);
 
 			if(definition) {
 				images.push((definition));
@@ -41,4 +44,4 @@ class MetaLogoStrategy extends AbstractStrategy
 	}
 }
 
-module.exports = MetaLogoStrategy;
+module.exports = TwitterLogoStrategy;

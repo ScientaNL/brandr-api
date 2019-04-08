@@ -2,12 +2,10 @@
 # yarn lockfile v1
 
 
-"@koa/cors@2":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@koa/cors/-/cors-2.2.3.tgz#c32a9907acbee1e72fedfb0b9ac840d2e6f9be57"
-  integrity sha512-tCVVXa39ETsit5kGBtEWWimjLn1sDaeu8+0phgb8kT3GmBDZOykkI3ZO8nMjV2p3MGkJI4K5P+bxR8Ztq0bwsA==
-  dependencies:
-    vary "^1.1.2"
+"@canvas/image-data@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@canvas/image-data/-/image-data-1.0.0.tgz#3bd2cd856e13fc9e2c25feff360a4056857b0367"
+  integrity sha512-BxOqI5LgsIQP1odU5KMwV9yoijleOPzHL18/YvNqF9KFSGF2K/DLlYAbDQsWqd/1nbaFuSkYD/191dpMtNh4vw==
 
 accepts@^1.3.5:
   version "1.3.5"
@@ -114,6 +112,21 @@ debug@~3.1.0:
   dependencies:
     ms "2.0.0"
 
+decode-bmp@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/decode-bmp/-/decode-bmp-0.1.0.tgz#a7a0ad133dcdc717a437132e86fd91124254d090"
+  integrity sha512-i7ImaOawHIwQNIt3IpO8X04ZRGI4A7gqX3vPw5aMIqMwsAk5xs/pnWLKmXc97nII5rSGJB9QyauO5FwctFiYoQ==
+  dependencies:
+    to-data-view "^1.0.0"
+
+decode-ico@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/decode-ico/-/decode-ico-0.3.1.tgz#8ef97be1c8507761a8e14c5b5c732b29d4c102a2"
+  integrity sha512-Ejv981YSYeAVyebE+g/Z/3hhE9wLE0uOBmiglqnhRfVMbLu1mf0CCesOoFWjdDqDYBOWIYLHJ6+uQxjlID3FEg==
+  dependencies:
+    decode-bmp "^0.1.0"
+    to-data-view "^1.0.0"
+
 deep-equal@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
@@ -216,6 +229,15 @@ humanize-number@0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/humanize-number/-/humanize-number-0.0.2.tgz#11c0af6a471643633588588048f1799541489c18"
   integrity sha1-EcCvakcWQ2M1iFiASPF5lUFInBg=
+
+ico-to-png@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/ico-to-png/-/ico-to-png-0.1.3.tgz#0e87e282b68ba2ea204649d545d765c58c919424"
+  integrity sha512-4mjhG2pMA/b+IHU+sBGdxBVBqsj833mQroifHbekCGxQM2kozuhsW3nK72sQhxJAXix0vFLMu0LgJe0LwZ3HBg==
+  dependencies:
+    decode-ico "^0.3.1"
+    lodepng "^1.2.0"
+    resize-image-data "^0.2.0"
 
 image-size@^0.7.3:
   version "0.7.3"
@@ -374,6 +396,13 @@ koa@^2.4.1:
     type-is "^1.6.16"
     vary "^1.1.2"
 
+lodepng@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/lodepng/-/lodepng-1.2.0.tgz#088cc1192578e652025006caef0971d1b4f296c5"
+  integrity sha512-nLlKnKNImiC3CjwmfiUne7sPj0Ba5+6HFXDkm+pOuI1j8sAJpOMcRe5ATgS9W4nod2SVGgiPv8LSbt99W7jx2g==
+  dependencies:
+    nan "^2.6.2"
+
 media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
@@ -414,6 +443,11 @@ mz@^2.7.0:
     any-promise "^1.0.0"
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
+
+nan@^2.13.2, nan@^2.6.2:
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.13.2.tgz#f51dc7ae66ba7d5d55e1e6d4d8092e802c9aefe7"
+  integrity sha512-TghvYc72wlMGMVMluVo9WRJc0mB8KxxF/gZ4YYFy7V2ZQX9l7rgbPg7vjS9mt6U5HXODVFVI2bOduCzwOMv/lw==
 
 negotiator@0.6.1:
   version "0.6.1"
@@ -487,6 +521,13 @@ readable-stream@2:
     string_decoder "~1.1.1"
     util-deprecate "~1.0.1"
 
+resize-image-data@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/resize-image-data/-/resize-image-data-0.2.0.tgz#1b1be122357ae7cb50bee565fa04f821fbf83ac5"
+  integrity sha512-IHpSGlgZM4Ejo/v0Qocn+NVoUKHhNUG5U0xV7usLPBRBaQQUEY7pTOkBb/xydZxzAIpYkpG0cUlGZtLgLLIfFw==
+  dependencies:
+    "@canvas/image-data" "^1.0.0"
+
 resolve-path@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/resolve-path/-/resolve-path-1.4.0.tgz#c4bda9f5efb2fce65247873ab36bb4d834fe16f7"
@@ -555,6 +596,11 @@ thenify-all@^1.0.0:
   integrity sha1-5p44obq+lpsBCCB5eLn2K4hgSDk=
   dependencies:
     any-promise "^1.0.0"
+
+to-data-view@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/to-data-view/-/to-data-view-1.0.0.tgz#4980623719ccb6a2232ae6d82d9ffd0a2e2e39fd"
+  integrity sha512-pz/bdULSupr+shtVLFHRBXstHfeBByfT9oa1oVOMBR4FWJkuFuD/OFdXZkR8sWONbtfKO7m3Tin/tKM+k3Qt8Q==
 
 toidentifier@1.0.0:
   version "1.0.0"

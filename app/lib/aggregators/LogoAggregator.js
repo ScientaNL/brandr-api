@@ -9,25 +9,60 @@ class LogoAggregator {
 	}
 
 	async aggregate(data) {
-		if (data['dom-logo']) {
-			data['dom-logo'] = await this.aggregateDomLogo(data['dom-logo']);
+
+		let matches = this.combineStrategies(data);
+		this.weighMatches(matches);
+
+		matches.sort((a,b) => b.weight - a.weight);
+		matches = matches.slice(0,3);
+
+		let result = {guesses: []};
+		for(let logo of matches) {
+			result.guesses.push(await this.storeLogo(logo));
 		}
-		return data;
+
+		for(let strategy in data) {
+			if(data.hasOwnProperty(strategy) === false) {
+				continue;
+			}
+
+			let logos = data[strategy];
+			logos.sort((a,b) => b.weight - a.weight);
+
+			if(logos.length <= 0) {
+				continue;
+			}
+
+			result[strategy] = await this.storeLogo(logos[0]);
+		}
+		
+		return result;
 	}
 
-	async aggregateDomLogo(data) {
-		if (!data[0]) {
-			return null;
+	combineStrategies(data) {
+		let matches = [];
+		for(let strategy in data) {
+			if(data.hasOwnProperty(strategy) === true) {
+				matches = [...matches, ...data[strategy]];
+			}
 		}
 
+		return matches;
+	}
 
-		//For testing Use one logo to test with
-		let logo = data[0];
+	weighMatches(matches) {
+		for(let match of matches) {
+			if(match.extension === "svg") {
+				match.weight *= 1.3;
+			}
+		}
+	}
 
-		let hash = hasha(logo.logo.buffer, {algorithm: 'md5'});
-		let filename = `${hash}.${logo.logo.extension}`;
+	async storeLogo(logo) {
+		let hash = hasha(logo.buffer, {algorithm: 'md5'});
+		let filename = `${hash}.${logo.extension}`;
 
-		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.logo.buffer);
+		await fs.promises.writeFile(`${this.storagePath}/${filename}`, logo.buffer);
 
 		return `${this.host}/${filename}`;
 	}

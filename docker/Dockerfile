@@ -46,6 +46,8 @@ RUN apt-get update && apt-get install -yq \
 	wget \
 	gnupg \
 	dirmngr \
+	python \
+	build-essential \
 	&& wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb \
 	&& dpkg -i dumb-init_*.deb \
 	&& rm -f dumb-init_*.deb \
@@ -53,7 +55,10 @@ RUN apt-get update && apt-get install -yq \
 
 #RUN groupadd --gid 1001 pptruser \
 #	&& useradd --uid 1001 --gid pptruser --groups audio,video --shell /bin/bash --create-home pptruser
-RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser
+
+RUN mkdir -p /home/pptruser
+RUN groupadd -r pptruser && useradd -d /home/pptruser -r -g pptruser -G audio,video pptruser
+RUN chown -R pptruser:pptruser /home/pptruser
 
 RUN yarn global add nodemon puppeteer@1.14.0 && yarn cache clean
 
@@ -74,11 +79,12 @@ RUN chmod +x /usr/local/bin/docker-node-entrypoint
 COPY ./app /app/
 RUN yarn install
 
+RUN mkdir -p /output
+
 RUN chown -R pptruser:pptruser /app
+RUN chown -R pptruser:pptruser /output
 
 USER pptruser
-
-RUN mkdir -p /output
 
 ENTRYPOINT ["dumb-init", "--"]
 

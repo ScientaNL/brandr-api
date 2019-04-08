@@ -5,6 +5,10 @@ class DOMLogoStrategyParser {
 
 	loggingEnabled = false;
 
+	siteRoot = "";
+
+	documentClientRect = null;
+
 	weighingStrategies = [
 		(data, element, weight) => { // Do I tell you I am indeed a logo?
 			if(element.getAttribute("itemprop") === "logo") {
@@ -22,8 +26,8 @@ class DOMLogoStrategyParser {
 				if (cursor.tagName === "A" && cursor.href) {
 					let href = cursor.href.replace(/\/$/g, "");
 
-					if (href === siteRoot) {
-						weight += linkFactor;
+					if (href === this.siteRoot) {
+						weight += linkFactor * 3;
 						this.log(`Because I am part of a link, I added ${linkFactor} now counting ${weight}`);
 					}
 				}
@@ -32,6 +36,13 @@ class DOMLogoStrategyParser {
 					weight += linkFactor;
 					this.log(`Because I have a logo class, I added ${linkFactor} now counting ${weight}`);
 				}
+
+				if(('' + cursor.getAttribute("id")).toLowerCase() ===  "logo") {
+					weight += linkFactor * 6;
+				} else if(('' + cursor.getAttribute("id")).toLowerCase().indexOf("logo") !==  -1) {
+					weight += linkFactor;
+				}
+
 
 				cursor = cursor.parentElement;
 			} while (cursor && (linkFactor = linkFactor - .08) > 0);
@@ -61,9 +72,16 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { // How high am I positioned?
-			if (element.getBoundingClientRect().top < 150) {
+
+			let boundingClientRect = element.getBoundingClientRect();
+
+			if (boundingClientRect.top < 150) {
 				weight += .35;
 				this.log(`Because I am very abovy. I added .25 now counting ${weight}`);
+			}
+
+			if(boundingClientRect.left > 0 && boundingClientRect.right < this.documentClientRect.right) {
+				weight += .4 * (1 - element.getBoundingClientRect().left / this.documentClientRect.right);
 			}
 
 			return weight;
@@ -98,6 +116,10 @@ class DOMLogoStrategyParser {
 			let cookie = false;
 
 			for(let parent of DOMLogoStrategyParser.getElementParents(element)) {
+				if(parent === this.document.body) { // Don't use the body
+					break;
+				}
+
 				if(header === false && parent.tagName.toLowerCase() === "header") {
 					weight += .15;
 					header = true;
@@ -154,6 +176,9 @@ class DOMLogoStrategyParser {
 
 	constructor(document) {
 		this.document = document;
+
+		this.siteRoot = (this.document.location.origin + this.document.location.pathname).replace(/\/$/g, "");
+		this.documentClientRect = this.document.body.getBoundingClientRect();
 	}
 
 	parse() {
@@ -231,8 +256,17 @@ class DOMLogoStrategyParser {
 			while (logoClassSubtreeWalker.nextNode()) {
 				logos = [...logos, ...this.parseComputedStyles(logoClassSubtreeWalker.currentNode)];
 			}
-		} else if(this.hasLogoBackground(element)) {
+		} else if(this.hasLogoBackground(element)) { // No logo class? Try image file names
 			logos = [...logos, ...this.parseComputedStyles(element)];
+
+		} else if(element.tagName.toLowerCase() === "a" && element.href.replace(/\/$/g, "") === this.siteRoot) { // Are we a link to home? Be desperate to resolve images
+
+			logos = [...logos, ...this.parseComputedStyles(element)];
+
+			let logoClassSubtreeWalker = this.createTreeWalker(element);
+			while (logoClassSubtreeWalker.nextNode()) {
+				logos = [...logos, ...this.parseComputedStyles(logoClassSubtreeWalker.currentNode)];
+			}
 		}
 
 		return logos;
@@ -325,13 +359,29 @@ class DOMLogoStrategyParser {
 		let matches = [];
 		let weightFactor = 0;
 		for (let url of this.getBackgroundImageUrls(element)) {
-			matches.push(
-				this.createLogoMatch(
-					{type: 'file', src: url},
-					element,
-					weightFactor
-				)
-			);
+
+			if(url.indexOf("data:image/svg+xml;base64,") === 0) {
+				try {
+					const svg = atob(url.substr(26).trim());
+					matches.push(
+						this.createLogoMatch(
+							{type: 'svg', svg: svg},
+							element,
+							weightFactor
+						)
+					);
+				}
+				catch(e) {}
+			} else {
+				matches.push(
+					this.createLogoMatch(
+						{type: 'file', src: url},
+						element,
+						weightFactor
+					)
+				);
+			}
+
 			weightFactor = weightFactor - .25;
 		}
 
@@ -379,10 +429,6 @@ class DOMLogoStrategyParser {
 	}
 
 	calculateWeight(data, element, weight) {
-
-		if(data.src) {
-			data.src = data.src.replace("logo-extractor", "dinges-extractor"); //Even voor nu
-		}
 
 		this.loggingEnabled && console.group(`Weighing %s`, JSON.stringify(data).substr(0, 150));
 		this.log(`starting with ${weight}`);
