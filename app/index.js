@@ -6,6 +6,7 @@ const Router = require('koa-router');
 const serveStatic = require('koa-static');
 const logger = require('koa-logger');
 const json = require('koa-json');
+const cors = require('@koa/cors');
 const debug = require('debug')('http');
 
 /**
@@ -52,7 +53,11 @@ app.use(async function (ctx, next) {
 	return debug.enabled ? koaLog(ctx, next) : await next();
 });
 
+
 app.use(json());
+app.use(cors({
+	origin: '*'
+}));
 app.use(router.routes());
 app.use(router.allowedMethods());
 
