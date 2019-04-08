@@ -17,6 +17,7 @@ const ArrayMerger = require('./pipeline/ArrayMerger');
 const ArrayWeighSort = require('./pipeline/ArrayWeighSort');
 const ArrayUnique = require('./pipeline/ArrayUnique');
 const BestLogoMatchAggregator = require('./pipeline/BestLogoMatchAggregator');
+const LogoColorAggregator = require('./pipeline/LogoColorAggregator');
 const NthIndex = require('./pipeline/NthIndex');
 
 class Extractor
@@ -72,6 +73,18 @@ class Extractor
 		this.registerPipeline(new Pipeline('site-style', [
 			new ArrayMerger([StyleColorsStrategy.getId()])
 		]));
+
+		// this.registerPipeline(new Pipeline('logo-color', [
+		// 	new ArrayMerger([
+		// 		DomLogoStrategy.getId(),
+		// 		MetaLogoStrategy.getId(),
+		// 		FacebookLogoStrategy.getId(),
+		// 		TwitterLogoStrategy.getId()
+		// 	]),
+		// 	new ArrayWeighSort(),
+		// 	new ArrayUnique(),
+		// 	new LogoColorAggregator(4)
+		// ]));
 	}
 
 	registerExtractor(extractor) {
