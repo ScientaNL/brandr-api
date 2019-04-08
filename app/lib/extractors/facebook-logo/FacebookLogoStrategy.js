@@ -2,7 +2,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 
 class FacebookLogoStrategy extends AbstractStrategy
 {
-	getId() {
+	static getId() {
 		return 'facebook-logo';
 	}
 

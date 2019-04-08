@@ -2,7 +2,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 
 class MetaLogoStrategy extends AbstractStrategy
 {
-	getId() {
+	static getId() {
 		return 'meta-logo';
 	}
 

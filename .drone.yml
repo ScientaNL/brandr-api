@@ -39,3 +39,4 @@ pipeline:
       - /drone/docker-ids
     volumes:
       - /tmp/cache:/cache
+

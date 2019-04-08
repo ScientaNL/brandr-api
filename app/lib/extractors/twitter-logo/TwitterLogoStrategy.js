@@ -2,7 +2,7 @@ const AbstractStrategy = require('../AbstractStrategy');
 
 class TwitterLogoStrategy extends AbstractStrategy
 {
-	getId() {
+	static getId() {
 		return 'twitter-logo';
 	}
 

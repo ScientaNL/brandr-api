@@ -2,10 +2,11 @@ const fetch = require('node-fetch');
 const imageType = require('image-type');
 const isSvg = require('is-svg');
 const icoToPng = require('ico-to-png');
+const hasha = require('hasha');
 
 class AbstractStrategy
 {
-	getId() {
+	static getId() {
 		throw new Error(`Please implement getId method in strategy`);
 	}
 
@@ -17,12 +18,12 @@ class AbstractStrategy
 		throw new Error(`Please implement parsePage method in strategy`);
 	};
 
-	async handlePage(uri, page, newPageExtractor) {
+	async handlePage(page) {
 		let result = await page.evaluate(this.parsePage);
-		return await this.processParserResult(result, newPageExtractor);
+		return await this.processParserResult(result);
 	}
 
-	async processParserResult(parserResult, newPageExtractor) {
+	async processParserResult(parserResult) {
 		return parserResult;
 	}
 
@@ -107,16 +108,17 @@ class AbstractStrategy
 	async processDownload(url, weight) {
 
 		try {
-			let imgDefinition = await this.downloadFile(url);
+			let imageDefinition = await this.downloadFile(url);
 
-			if(!imgDefinition) {
+			if(!imageDefinition) {
 				return null;
 			}
 
 			return {
-				buffer: imgDefinition.buffer,
-				extension: imgDefinition.extension,
-				origin: imgDefinition.origin,
+				buffer: imageDefinition.buffer,
+				hash: this.getBufferHash(imageDefinition.buffer),
+				extension: imageDefinition.extension,
+				origin: imageDefinition.origin,
 				weight: weight
 			};
 		} catch(e) {
@@ -124,7 +126,10 @@ class AbstractStrategy
 
 			return null;
 		}
+	}
 
+	getBufferHash(buffer) {
+		return hasha(buffer, {algorithm: 'md5'});
 	}
 }
 
