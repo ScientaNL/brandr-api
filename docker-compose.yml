@@ -9,7 +9,7 @@ services:
       - ./app/node_modules:/app/node_modules
       - /app/resources/hosts-blocklist
     ports:
-      - "${BIND_INTERFACE}:1337:80"
+      - "${BIND_INTERFACE}:1337:3000"
     environment:
       - NODE_ENV=dev
       - APP_HOST=http://${BIND_INTERFACE}:1337
