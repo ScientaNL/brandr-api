@@ -18,6 +18,7 @@
 		"image-type": "^4.0.0",
 		"is-svg": "^4.0.0",
 		"koa": "^2.4.1",
+		"koa-bodyparser": "^4.2.1",
 		"koa-json": "^2.0.2",
 		"koa-logger": "^3.1.0",
 		"koa-router": "^7.3.0",

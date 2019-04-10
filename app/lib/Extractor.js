@@ -16,7 +16,8 @@ const Pipeline = require('./pipeline/Pipeline');
 const ArrayMerger = require('./pipeline/ArrayMerger');
 const ArrayWeighSort = require('./pipeline/ArrayWeighSort');
 const ArrayUnique = require('./pipeline/ArrayUnique');
-const BestLogoMatchAggregator = require('./pipeline/BestLogoMatchAggregator');
+const ArraySlice = require('./pipeline/ArraySlice');
+const StoreLogo = require('./pipeline/StoreLogo');
 const LogoColorAggregator = require('./pipeline/LogoColorAggregator');
 const NthIndex = require('./pipeline/NthIndex');
 
@@ -43,14 +44,16 @@ class Extractor
 			]),
 			new ArrayWeighSort(),
 			new ArrayUnique(),
-			new BestLogoMatchAggregator(3, storagePath, host),
+			new ArraySlice(0, 3),
+			new StoreLogo(storagePath, host),
 		]));
 
 		this.registerPipeline(new Pipeline('dom-logo', [
 			new ArrayMerger([DomLogoStrategy.getId()]),
 			new ArrayWeighSort(),
 			new ArrayUnique(),
-			new BestLogoMatchAggregator(1, storagePath, host),
+			new ArraySlice(0, 1),
+			new StoreLogo(storagePath, host),
 			new NthIndex(0)
 		]));
 
@@ -58,7 +61,8 @@ class Extractor
 			new ArrayMerger([FacebookLogoStrategy.getId(), TwitterLogoStrategy.getId()]),
 			new ArrayWeighSort(),
 			new ArrayUnique(),
-			new BestLogoMatchAggregator(1, storagePath, host),
+			new ArraySlice(0, 1),
+			new StoreLogo(storagePath, host),
 			new NthIndex(0)
 		]));
 
@@ -66,7 +70,8 @@ class Extractor
 			new ArrayMerger([MetaLogoStrategy.getId()]),
 			new ArrayWeighSort(),
 			new ArrayUnique(),
-			new BestLogoMatchAggregator(1, storagePath, host),
+			new ArraySlice(0, 1),
+			new StoreLogo(storagePath, host),
 			new NthIndex(0)
 		]));
 
