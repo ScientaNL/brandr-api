@@ -117,6 +117,8 @@ class Extractor
 		debug('extracting:', uri);
 		const page = await this.navigator.newPage(uri);
 
+		console.log("Page loaded");
+
 		console.time("extractors");
 		let extractions = await this.runExtractors(page);
 		console.timeEnd("extractors");
@@ -155,6 +157,7 @@ class Extractor
 					addedScripts.push(filePath);
 				}
 			}
+
 			results[groupName] = await extractor.handlePage(page);
 		}
 

@@ -100,7 +100,6 @@ class Blocklist
 			let parts = line.split('/');
 			if (parts.length === 3 && parts[2] === '0.0.0.0') {
 				let domain = parts[1];
-				console.log(domain);
 				domains[domain] = true;
 				domainCount++;
 				let domainParts = domain.split('.');

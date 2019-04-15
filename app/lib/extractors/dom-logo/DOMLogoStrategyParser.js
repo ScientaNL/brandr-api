@@ -39,10 +39,11 @@ class DOMLogoStrategyParser {
 
 				if(('' + cursor.getAttribute("id")).toLowerCase() ===  "logo") {
 					weight += linkFactor * 6;
+					this.log(`Because I have a logo id, I added ${linkFactor*6} now counting ${weight}`);
 				} else if(('' + cursor.getAttribute("id")).toLowerCase().indexOf("logo") !==  -1) {
-					weight += linkFactor;
+					weight += linkFactor * 1.5;
+					this.log(`Because ID contains logo, I added ${linkFactor} now counting ${weight}`);
 				}
-
 
 				cursor = cursor.parentElement;
 			} while (cursor && (linkFactor = linkFactor - .08) > 0);
@@ -81,7 +82,9 @@ class DOMLogoStrategyParser {
 			}
 
 			if(boundingClientRect.left > 0 && boundingClientRect.right < this.documentClientRect.right) {
-				weight += .4 * (1 - element.getBoundingClientRect().left / this.documentClientRect.right);
+				let factor = .4 * (1 - element.getBoundingClientRect().left / this.documentClientRect.right);
+				weight += factor;
+				this.log(`Because I appreciate a logo on the left (LTR). I added ${factor} now counting ${weight}`);
 			}
 
 			return weight;
@@ -494,7 +497,9 @@ class DOMLogoStrategyParser {
 
 				if(id.indexOf("#") === 0) {
 					let symbolElm = this.document.getElementById(id.substr(1));
-					element.appendChild(symbolElm);
+					if(symbolElm) {
+						element.appendChild(symbolElm);
+					}
 				}
 			} else {
 				let cssDelaration = this.document.defaultView.getComputedStyle(curElm);
