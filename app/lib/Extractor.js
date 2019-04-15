@@ -157,11 +157,8 @@ class Extractor
 					addedScripts.push(filePath);
 				}
 			}
-			setTimeout(() => {
-				page.screenshot({path: "/app/tets.png"});
-			}, 3000);
+
 			results[groupName] = await extractor.handlePage(page);
-			console.log(1);
 		}
 
 		return results;
