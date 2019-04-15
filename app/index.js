@@ -11,6 +11,9 @@ const bodyParser = require('koa-bodyparser');
 
 const debug = require('debug')('http');
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; //Dynamite ;'-)
+
+
 /**
  * Do some scraping
  */
