@@ -55,6 +55,7 @@ class Navigator
 	async configurePage(page, uri) {
 		await page.setBypassCSP(true);
 		await page.setRequestInterception(true);
+		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36');
 
 		let originalHost = null, uriParts = uri.split('/');
 		if (uriParts.length > 2) {
