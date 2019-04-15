@@ -87,12 +87,18 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { // Do I name myself a logo?
-			let alt = '' + element.getAttribute("alt");
-			let title = '' + element.getAttribute("alt");
+			let alt = ('' + element.getAttribute("alt")).toLowerCase();
+			let title = ('' + element.getAttribute("alt")).toLowerCase();
 
-			if (alt.toLowerCase().indexOf("logo") !== -1 || title.toLowerCase().indexOf("logo") !== -1) {
+			if (alt.indexOf("logo") !== -1 || title.indexOf("logo") !== -1) {
 				weight += .15;
-				this.log(`Because i have a logo alt or title. I added .15 now counting ${weight}`);
+				this.log(`Because I have a logo alt or title. I added .15 now counting ${weight}`);
+			}
+
+			let siteName = this.getWebsiteName();
+			if(siteName && (alt.indexOf(siteName) !== -1 || title.indexOf(siteName) !== -1)) {
+				weight += .2;
+				this.log(`Because there is in my alt or title the deduced website name is found. I added .2 now counting ${weight}`);
 			}
 
 			return weight;
@@ -275,7 +281,7 @@ class DOMLogoStrategyParser {
 	parseImage(element) {
 		let logos = [];
 
-		let src = '' + element.src;
+		let src = '' + element.currentSrc;
 		let srcset = element.srcset;
 
 		if (srcset) {
@@ -308,7 +314,7 @@ class DOMLogoStrategyParser {
 					.2
 				)
 			);
-		} else {
+		} else if(src) {
 			logos.push(
 				this.createLogoMatch(
 					{type: 'file', src: this.convertUrlToAbsolute(src)},
@@ -521,4 +527,65 @@ class DOMLogoStrategyParser {
 
 		return urls;
 	}
+
+	getWebsiteName() {
+		let selectors = [
+			"head > meta[name=author]",
+			// "head > meta[name=description]",
+			"head > meta[property='og:title']",
+			// "meta[property='og:description']",
+			"head > meta[property='og:site_name']",
+			"head > title",
+			// "h1"
+		];
+
+		let splitText = (text) => {
+			return ('' + text).split(/[|.:\-,_\s]/).filter((word) => !!word.trim());
+		};
+
+		let words = [];
+		for(let node of this.document.querySelectorAll(selectors.join(","))) {
+			switch(node.tagName.toLowerCase()) {
+				case "meta":
+					words = [...words, ...splitText('' + node.getAttribute("content"))];
+					break;
+				case "title":
+				case "h1":
+					words = [...words, ...splitText('' + node.innerText)];
+					break;
+			}
+		}
+
+		// Take the site root into the equation
+		words = [...words, ...splitText(this.siteRoot)];
+
+		let wordCountMap = {};
+
+		for(let word of words) {
+			word = word.toLowerCase();
+			if(!wordCountMap[word]) {
+				wordCountMap[word] = 0;
+			}
+
+			wordCountMap[word]++;
+		}
+
+		let mostUsedWord = "", highestCount = 1; //One word is no word
+		for(let word in wordCountMap) {
+			if(wordCountMap.hasOwnProperty(word) === false) {
+				continue;
+			}
+
+			let wordCount = wordCountMap[word];
+			if(wordCount > highestCount) {
+				mostUsedWord = word;
+				highestCount = wordCount;
+			}
+		}
+
+		return mostUsedWord;
+	}
 }
+
+// console.clear();
+// console.log((new DOMLogoStrategyParser(document)).parse());
