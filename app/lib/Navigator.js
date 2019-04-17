@@ -6,8 +6,11 @@ const Blocklist = require('./Blocklist');
 class Navigator
 {
 	constructor() {
+		this.pageLoadTimeout = 5000;
+
 		this.blocklist = null;
 		this.browserPromise = null;
+
 		this.defaultPuppeteerOptions = {
 			executablePath: 'google-chrome-unstable',
 			args: ['--no-sandbox', '--disable-dev-shm-usage'],
@@ -41,6 +44,10 @@ class Navigator
 		this.blocklist = null;
 	}
 
+	/**
+	 * Custom load await logic. Wait for load event, but if it doesn't come within time, accept domcontentloaded as
+	 * valid event as a marker of page load.
+	 */
 	async newPage(uri)
 	{
 		const browser = await this.getBrowser();
@@ -48,14 +55,28 @@ class Navigator
 		const page = await browser.newPage();
 		await this.configurePage(page, uri);
 
-		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
+		return new Promise((resolve, reject) => {
 
-		return page;
+			let domcontentloaded = false;
+			page.on("domcontentloaded", () => domcontentloaded = true);
+
+			let navigationResponse = page.goto(uri, {timeout: this.pageLoadTimeout, waitUntil: 'networkidle0'});
+			navigationResponse.then(() => {
+				resolve(page)
+			}, (e) => {
+				if(domcontentloaded === true) {
+					resolve(page);
+				} else {
+					reject(e);
+				}
+			});
+		});
 	}
 
 	async configurePage(page, uri) {
 		await page.setBypassCSP(true);
 		await page.setRequestInterception(true);
+
 		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36');
 
 		let originalHost = null, uriParts = uri.split('/');
