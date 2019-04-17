@@ -115,9 +115,10 @@ class Extractor
 
 	async extract(uri) {
 		debug('extracting:', uri);
-		const page = await this.navigator.newPage(uri);
 
-		console.log("Page loaded");
+		console.time("pageLoad");
+		const page = await this.navigator.newPage(uri);
+		console.timeEnd("pageLoad");
 
 		console.time("extractors");
 		let extractions = await this.runExtractors(page);
