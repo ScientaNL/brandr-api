@@ -18,7 +18,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; //Dynamite ;'-)
  * Do some scraping
  */
 const Extractor = require('./lib/Extractor');
-const extractor = new Extractor("/output", process.env.APP_HOST);
+const extractor = new Extractor("/output", process.env.API_ENDPOINT);
 extractor.init({useBlockList : false});
 
 /**
