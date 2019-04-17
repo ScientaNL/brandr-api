@@ -48,7 +48,8 @@ class Navigator
 		const page = await browser.newPage();
 		await this.configurePage(page, uri);
 
-		await page.goto(uri, {timeout: 10000, waitUntil: 'load'});
+		await page.goto(uri, {timeout: 10000, waitUntil: 'domcontentloaded'});
+
 		return page;
 	}
 
