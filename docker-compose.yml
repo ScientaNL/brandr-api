@@ -3,9 +3,10 @@ services:
   brandr-api:
     container_name: brandr-api
     image: scienta/brandr-api:branch-master
+    restart: always
     working_dir: /app
     ports:
-      - "${BIND_INTERFACE}:1337:3000"
+      - "${BIND_INTERFACE}:9080:3000"
     environment:
       - NODE_ENV=dev
       - API_ENDPOINT=${API_ENDPOINT}
