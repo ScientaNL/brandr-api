@@ -21,7 +21,11 @@ class StoreLogo {
 		let imagePath = `${this.storagePath}/${filename}`;
 		let imageEndpoint = `${this.host}/${filename}`;
 
-		await fs.promises.writeFile(imagePath, logo.buffer);
+		try {
+			await fs.promises.access(imagePath)
+		} catch(e) {
+			await fs.promises.writeFile(imagePath, logo.buffer);
+		}
 
 		return new StoredImage(logo, imagePath, imageEndpoint);
 	}
