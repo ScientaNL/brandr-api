@@ -15,6 +15,8 @@ pipeline:
     context: ./
     auto_tag: false
     tags: "branch-${DRONE_BRANCH}"
+    build_args:
+      - APP_VERSION=${DRONE_BRANCH}-${DRONE_COMMIT_SHA:0:7}
     storage_path: /drone/docker-brandr-api
     secrets: [ docker_username, docker_password ]
     when:
@@ -27,6 +29,8 @@ pipeline:
     context: ./
     auto_tag: false
     tags: "${DRONE_TAG}"
+    build_args:
+      - API_VERSION=${DRONE_BRANCH}
     storage_path: /drone/docker-brandr-api
     secrets: [ docker_username, docker_password ]
     when:

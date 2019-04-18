@@ -27,6 +27,16 @@ extractor.init({useBlockList : true});
 const app = new Koa();
 const router = new Router();
 
+router.get('/', async (ctx, next) => {
+	ctx.body = {
+		version: process.env.API_VERSION,
+		title: "BRANDr API",
+		author: "Scienta",
+		copyright: "\u00A9 Scienta " + (new Date()).getFullYear()
+	};
+});
+
+
 router.post('/extract', async (ctx, next) => {
 	let url = ctx.request.body.endpoint;
 	if(!url) {
