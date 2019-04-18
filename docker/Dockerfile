@@ -52,6 +52,9 @@ RUN yarn install
 
 RUN mkdir -p /output
 
+ARG API_VERSION
+ENV API_VERSION="${API_VERSION}"
+
 RUN chown -R pptruser:pptruser /app
 RUN chown -R pptruser:pptruser /output
 
