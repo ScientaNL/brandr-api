@@ -616,6 +616,11 @@ escape-string-regexp@^1.0.2:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
+etag@^1.3.0:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
+  integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+
 exif-parser@^0.1.12:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/exif-parser/-/exif-parser-0.1.12.tgz#58a9d2d72c02c1f6f02a0ef4a9166272b7760922"
@@ -866,6 +871,11 @@ koa-compose@^4.1.0:
   resolved "https://registry.yarnpkg.com/koa-compose/-/koa-compose-4.1.0.tgz#507306b9371901db41121c812e923d0d67d3e877"
   integrity sha512-8ODW8TrDuMYvXRwra/Kh7/rJo9BtOfPc6qO8eAfC80CnCvSjSl0bkRM24X6/XBBEyj0v1nRUQ1LyOy3dbqOWXw==
 
+koa-conditional-get@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/koa-conditional-get/-/koa-conditional-get-2.0.0.tgz#a43f3723c1d014b730a34ece8adf30b93c8233f2"
+  integrity sha1-pD83I8HQFLcwo07Oit8wuTyCM/I=
+
 koa-convert@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/koa-convert/-/koa-convert-1.2.0.tgz#da40875df49de0539098d1700b50820cebcd21d0"
@@ -873,6 +883,14 @@ koa-convert@^1.2.0:
   dependencies:
     co "^4.6.0"
     koa-compose "^3.0.0"
+
+koa-etag@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/koa-etag/-/koa-etag-3.0.0.tgz#9ef7382ddd5a82ab0deb153415c915836f771d3f"
+  integrity sha1-nvc4Ld1agqsN6xU0FckVg293HT8=
+  dependencies:
+    etag "^1.3.0"
+    mz "^2.1.0"
 
 koa-is-json@1, koa-is-json@^1.0.0:
   version "1.0.0"
@@ -1034,7 +1052,7 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-mz@^2.7.0:
+mz@^2.1.0, mz@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/mz/-/mz-2.7.0.tgz#95008057a56cafadc2bc63dde7f9ff6955948e32"
   integrity sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==

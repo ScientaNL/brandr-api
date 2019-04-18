@@ -2,12 +2,16 @@
  * API app requires
  */
 const Koa = require('koa');
+
 const Router = require('koa-router');
 const serveStatic = require('koa-static');
 const logger = require('koa-logger');
 const json = require('koa-json');
 const cors = require('@koa/cors');
 const bodyParser = require('koa-bodyparser');
+
+const conditional = require('koa-conditional-get');
+const etag = require('koa-etag');
 
 const debug = require('debug')('http');
 
@@ -100,6 +104,8 @@ app.use(async function (ctx, next) {
 
 
 app.use(bodyParser());
+app.use(conditional());
+app.use(etag());
 app.use(json());
 app.use(cors({origin: '*'}));
 app.use(router.routes());
