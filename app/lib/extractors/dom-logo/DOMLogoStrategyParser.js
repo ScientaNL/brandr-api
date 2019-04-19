@@ -381,10 +381,9 @@ class DOMLogoStrategyParser {
 			if (url.indexOf("data:image/svg+xml;") === 0) {
 				if (url.indexOf("data:image/svg+xml;base64,") === 0) {
 					try {
-						const svg = atob(url.substr(26).trim());
 						matches.push(
 							this.createLogoMatch(
-								{type: 'svg', svg: svg},
+								{type: 'svg', svg: atob(url.substr(26).trim())},
 								element,
 								weightFactor
 							)
