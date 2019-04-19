@@ -44,7 +44,7 @@ class AbstractStrategy
 			const response = await fetch(src);
 
 			result.buffer = await response.buffer();
-			result.origin = src;
+			result.origin = response.url || src;
 		}
 
 		const imageInfo = imageType(result.buffer);
