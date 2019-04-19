@@ -378,18 +378,29 @@ class DOMLogoStrategyParser {
 		let weightFactor = 0;
 		for (let url of this.getBackgroundImageUrls(element)) {
 
-			if(url.indexOf("data:image/svg+xml;base64,") === 0) {
-				try {
-					const svg = atob(url.substr(26).trim());
+			if (url.indexOf("data:image/svg+xml;") === 0) {
+				if (url.indexOf("data:image/svg+xml;base64,") === 0) {
+					try {
+						const svg = atob(url.substr(26).trim());
+						matches.push(
+							this.createLogoMatch(
+								{type: 'svg', svg: svg},
+								element,
+								weightFactor
+							)
+						);
+					} catch (e) {}
+				} else if (url.match(/data:image\/svg\+xml;charset.*?,/)) {
+					let data = url.split(",", 2)[1] || "";
+
 					matches.push(
 						this.createLogoMatch(
-							{type: 'svg', svg: svg},
+							{type: 'svg', svg: decodeURIComponent(data)},
 							element,
 							weightFactor
 						)
 					);
 				}
-				catch(e) {}
 			} else {
 				matches.push(
 					this.createLogoMatch(
