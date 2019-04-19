@@ -31,8 +31,6 @@ RUN yarn global add nodemon puppeteer@1.14.0 \
     && mkdir -p /home/pptruser/Downloads \
     && chown -R pptruser:pptruser /home/pptruser
 
-RUN wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O /home/pptruser/chrome.json
-
 ENV NODE_PATH="/usr/local/share/.config/yarn/global/node_modules:${NODE_PATH}"
 
 # Set language to UTF8

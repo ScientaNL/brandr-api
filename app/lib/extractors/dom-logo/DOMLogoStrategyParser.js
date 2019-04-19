@@ -9,6 +9,8 @@ class DOMLogoStrategyParser {
 
 	documentClientRect = null;
 
+	static inlineSvgMarker = 0;
+
 	weighingStrategies = [
 		(data, element, weight) => { // Do I tell you I am indeed a logo?
 			if(element.getAttribute("itemprop") === "logo") {
@@ -339,17 +341,17 @@ class DOMLogoStrategyParser {
 			}
 		}
 
-		this.inlineSvgUses(element);
+		let boundingClientRect = element.getBoundingClientRect();
+		let marker = "svg-mark-for-download-" + DOMLogoStrategyParser.inlineSvgMarker++;
 
+		element.classList.add(marker);
 		element.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 		element.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-
-		let svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
-			+ '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
-			+ element.outerHTML;
+		element.setAttribute("width", boundingClientRect.width);
+		element.setAttribute("height", boundingClientRect.height);
 
 		return [this.createLogoMatch(
-			{type: 'svg', svg: svg},
+			{type: 'svg', marker: marker},
 			element,
 			.2
 		)];
@@ -472,42 +474,6 @@ class DOMLogoStrategyParser {
 	log(message) {
 		if(this.loggingEnabled === true) {
 			console.log(message);
-		}
-	}
-
-	inlineSvgUses(element) {
-		let treeWalker = this.createTreeWalker(element);
-
-		// Could be all of https://www.w3.org/TR/SVG11/styling.html#SVGStylingProperties
-		let stylingProperties = ["fill", "stroke"];
-
-		while(treeWalker.nextNode()) {
-			let curElm = treeWalker.currentNode;
-			let tagName = curElm.tagName.toLowerCase();
-
-			if(tagName === "use") { //Add symbol to current svg
-				let id = "";
-				if(curElm.getAttribute("href")) {
-					id = curElm.getAttribute("href");
-				} else if(curElm.getAttribute("xlink:href")) {
-					id = curElm.getAttribute("xlink:href")
-				} else {
-					continue;
-				}
-
-				if(id.indexOf("#") === 0) {
-					let symbolElm = this.document.getElementById(id.substr(1));
-					if(symbolElm) {
-						element.appendChild(symbolElm);
-					}
-				}
-			} else {
-				let cssDelaration = this.document.defaultView.getComputedStyle(curElm);
-
-				for(let property of stylingProperties) {
-					curElm.style[property] =  cssDelaration.getPropertyValue(property);
-				}
-			}
 		}
 	}
 

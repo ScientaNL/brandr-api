@@ -117,11 +117,13 @@ class Extractor
 		debug('extracting:', uri);
 
 		console.time("pageLoad");
-		const page = await this.navigator.newPage(uri);
+		const result = await this.navigator.newPage(uri);
+		const page = result.page;
+		const cdp = result.cdp;
 		console.timeEnd("pageLoad");
 
 		console.time("extractors");
-		let extractions = await this.runExtractors(page);
+		let extractions = await this.runExtractors(page, cdp);
 		console.timeEnd("extractors");
 
 		if (!page.isClosed()) {
@@ -139,7 +141,7 @@ class Extractor
 		return results;
 	}
 
-	async runExtractors(page) {
+	async runExtractors(page, cdp) {
 
 		let results = {};
 		let addedScripts = [];
@@ -159,7 +161,7 @@ class Extractor
 				}
 			}
 
-			results[groupName] = await extractor.handlePage(page);
+			results[groupName] = await extractor.handlePage(page, cdp);
 		}
 
 		return results;

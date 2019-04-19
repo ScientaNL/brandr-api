@@ -17,12 +17,15 @@ class Navigator
 			defaultViewport: {
 				width: 1920,
 				height: 1080
-			}
+			},
+			headless: true,
+			devtools: true
 		}
 	}
 
 	async getInfo() {
 		const browser = await this.getBrowser();
+
 		return {
 			hasBlockList: this.blocklist === null,
 			chromePath: puppeteer.executablePath(),
@@ -53,6 +56,10 @@ class Navigator
 		const browser = await this.getBrowser();
 
 		const page = await browser.newPage();
+		const cdp = await page.target().createCDPSession();
+		await cdp.send('DOM.enable');
+		await cdp.send('CSS.enable');
+
 		await this.configurePage(page, uri);
 
 		return new Promise((resolve, reject) => {
@@ -62,10 +69,10 @@ class Navigator
 
 			let navigationResponse = page.goto(uri, {timeout: this.pageLoadTimeout, waitUntil: 'networkidle0'});
 			navigationResponse.then(() => {
-				resolve(page)
+				resolve({page: page, cdp: cdp})
 			}, (e) => {
 				if(domcontentloaded === true) {
-					resolve(page);
+					resolve({page: page, cdp: cdp});
 				} else {
 					reject(e);
 				}
