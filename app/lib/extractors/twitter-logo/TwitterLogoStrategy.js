@@ -35,7 +35,8 @@ class TwitterLogoStrategy extends AbstractStrategy
 				result.weight
 			);
 
-			if(definition) {
+			// Twitter logo can also resolve to default profile logo, ignore the egg ;-) (Which is not an egg anymore)
+			if(definition && definition.origin.indexOf("default_profile") === -1) {
 				images.push((definition));
 			}
 		}
