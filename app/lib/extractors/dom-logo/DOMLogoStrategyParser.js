@@ -257,6 +257,7 @@ class DOMLogoStrategyParser {
 
 		} else if (element.tagName.toLowerCase() === "object" && element.getAttribute("type")) { // Image in object
 			logos = [...logos, ...this.parseImageObject(element)];
+
 		} else if (this.hasLogoClass(element)) {
 
 			// Check if the current element not only has a logo class, but has an image as background
@@ -341,6 +342,20 @@ class DOMLogoStrategyParser {
 			}
 		}
 
+		let containedImages = element.querySelectorAll(":scope > image[*|href]");
+
+		if(containedImages.length > 0) {
+			let logos = [];
+
+			containedImages.forEach((image) => logos = [...logos, ...this.parseSVGImage(image, element)]);
+
+			return logos;
+		} else {
+			return this.parseInlineSVG(element);
+		}
+	}
+	
+	parseInlineSVG(element) {
 		let boundingClientRect = element.getBoundingClientRect();
 		let marker = "svg-mark-for-download-" + DOMLogoStrategyParser.inlineSvgMarker++;
 
@@ -355,6 +370,20 @@ class DOMLogoStrategyParser {
 			element,
 			.2
 		)];
+	}
+
+	parseSVGImage(imageElement, hostElement) {
+		let src = imageElement.getAttribute("xlink:href") || imageElement.getAttribute("href");
+
+		if(src) {
+			return [this.createLogoMatch(
+				{type: 'file', src: this.convertUrlToAbsolute(src)},
+				hostElement,
+				.2
+			)];
+		} else {
+			return [];
+		}
 	}
 
 	parseImageObject(element) {
