@@ -312,10 +312,10 @@ class DOMLogoStrategyParser {
 					);
 				}
 			}
-		} else if (src.match(/^data:image\/(?:png|jpg|gif);base64,/i)) {
+		} else if (src.match(/^data:image\/(?:png|jpg|gif|webp);base64,/i)) {
 			logos.push(
 				this.createLogoMatch(
-					{type: 'base64', src: src},
+					{type: 'file', src: src},
 					element,
 					.2
 				)
