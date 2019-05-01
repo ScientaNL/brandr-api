@@ -41,6 +41,10 @@ class DomLogoStrategy extends AbstractStrategy
 				if(imageDefinition) {
 					let weight = this.weighLogo(logo, imageDefinition);
 
+					// if(imageDefinition.origin === "https://www.pearle.nl/is-bin/intershop.static/WFS/org-nl_pearle-Site/-/nl_NL/images/branding.png") {
+						console.log(imageDefinition.origin, weight);
+					// }
+
 					images.push({
 						buffer: imageDefinition.buffer,
 						hash: this.getBufferHash(imageDefinition.buffer),

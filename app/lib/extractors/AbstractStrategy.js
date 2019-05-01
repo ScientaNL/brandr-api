@@ -3,6 +3,7 @@ const imageType = require('image-type');
 const isSvg = require('is-svg');
 const icoToPng = require('ico-to-png');
 const hasha = require('hasha');
+const sharp = require('sharp');
 
 class AbstractStrategy
 {
@@ -55,6 +56,10 @@ class AbstractStrategy
 				case "png":
 				case "gif":
 					result.extension = imageInfo.ext;
+					break;
+				case "webp":
+					result.buffer = await sharp(result.buffer).png().toBuffer();
+					result.extension = "png";
 					break;
 				case"ico":
 					let pngBuffer = await this.parseIco(result.buffer, src);
