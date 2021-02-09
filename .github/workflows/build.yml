@@ -1,0 +1,66 @@
+name: Build and push docker image for branch or tag
+on:
+  release:
+    types: [ created ]
+  push:
+    branches: [ '**' ]
+jobs:
+  build-brandr-api-container:
+    name: Build brandr-api container
+    runs-on: ubuntu-latest
+    if: github.repository == 'ScientaNL/brandr-api'
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Github environment variables
+        uses: ScientaNL/github-actions-env-toolkit@1.0.0
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_PUBLIC_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PUBLIC_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build & push Docker image for branch
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v2
+        with:
+          file: ./docker/Dockerfile
+          context: .
+          push: true
+          tags: scienta/brandr-api:branch-${{env.GITHUB_REF_NAME_SLUG}}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: |
+            - API_VERSION=${{env.GITHUB_REF_NAME_SLUG}}-${{env.GITHUB_SHA_SHORT}}
+
+      - name: Build & push Docker image for release
+        if: github.event_name == 'release'
+        uses: docker/build-push-action@v2
+        with:
+          file: ./docker/Dockerfile
+          context: .
+          push: true
+          tags: scienta/brandr-api:${{env.GITHUB_REF_NAME_SLUG}}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: |
+            - API_VERSION=${{env.GITHUB_REF_NAME_SLUG}}
+
