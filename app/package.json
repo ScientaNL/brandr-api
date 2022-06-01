@@ -29,7 +29,7 @@
 		"nan": "^2.13.2",
 		"node-fetch": "^2.3.0",
 		"node-vibrant": "^3.2.0-alpha",
-		"sharp": "^0.22.1",
+		"sharp": "^0.30.5",
 		"urijs": "^1.19.0"
 	}
 }
