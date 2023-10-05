@@ -1,0 +1,15 @@
+version: '3.2'
+services:
+  brandr-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    restart: always
+    working_dir: /app
+    ports:
+      - "${BIND_INTERFACE}:9080:3000"
+    environment:
+      - NODE_ENV=dev
+      - API_ENDPOINT=${API_ENDPOINT}
+      - DEBUG=*,-navigator:info,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
+    command: nodemon /app/index.js

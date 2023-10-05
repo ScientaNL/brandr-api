@@ -1,4 +1,4 @@
-FROM node:10-slim
+FROM node:20-slim
 
 RUN apt-get update \
     && apt-get install -y \
@@ -6,12 +6,13 @@ RUN apt-get update \
     fonts-wqy-zenhei \
     fonts-thai-tlwg \
     fonts-kacst \
-    ttf-freefont \
+    fonts-freefont-ttf \
 	wget \
 	gnupg \
 	dirmngr \
-	python \
+	python3 \
 	build-essential \
+    dumb-init \
 	ca-certificates \
       --no-install-recommends \
 	&& wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -22,13 +23,10 @@ RUN apt-get update \
     && rm -rf /src/*.deb \
     && apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
-RUN chmod +x /usr/local/bin/dumb-init
-
 # Use installed chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN yarn global add nodemon puppeteer@1.14.0 \
+RUN yarn global add nodemon node-gyp@9.4.0 puppeteer@1.14.0 \
     && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
     && chown -R pptruser:pptruser /home/pptruser
