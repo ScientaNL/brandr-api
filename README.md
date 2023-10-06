@@ -4,15 +4,16 @@ BRANDr is an API which retrieves the logos and branding colors of a website. You
 The project utilizes [Puppeteer](https://github.com/GoogleChrome/puppeteer) in order to load a website and perform strategies to assert what the logo and branding colors of a website could be. There are various strategies deployed:
 - DOM parsing
 - Meta parsing
-- Social data parsing 
-- Color usage parsing 
+- Social data parsing
+- Color usage parsing
 
 ## Deploying the BRANDr API
-Checkout the repository, create your own `.env` file and deploy the BRANDr API Docker container using `docker-compose`:
+Checkout the repository, create your own `.env` file (the defaults should be fine) and deploy the BRANDr API Docker container using `docker-compose`:
 
 ```bash
-docker-compose up -d
-``` 
+docker-compose -f docker-compose.local.yml up -d --force-recreate \
+  && docker-compose -f docker-compose.local.yml logs -f
+```
 
 Use `docker logs` to monitor the container usage and debug information.
 
