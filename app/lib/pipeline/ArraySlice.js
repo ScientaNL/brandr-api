@@ -1,16 +1,11 @@
-const fs = require('fs');
-
-class ArraySlice {
+export default class ArraySlice {
 
 	constructor(start, number) {
 		this.start = start;
-		this.number =  number;
+		this.number = number;
 	}
 
 	async process(data) {
 		return data.slice(this.start, this.number);
 	}
 }
-
-module.exports = ArraySlice;
-

@@ -1,12 +1,12 @@
-const fs = require('fs');
-const readline = require('readline');
-const debug = require('debug')('blocklist');
+import fs from 'fs';
+import readline from 'readline';
+import debugPackage from 'debug';
+
+const debug = debugPackage('blocklist');
 debug.log = console.log.bind(console);
 
-class Blocklist
-{
-	constructor()
-	{
+export default class Blocklist {
+	constructor() {
 		this.domains = {};
 		this.fileTypes = {
 			//video
@@ -34,12 +34,11 @@ class Blocklist
 			"ogg": true,
 			"wav": true,
 			"wma": true,
-			"wpl": true
-		}
+			"wpl": true,
+		};
 	}
 
-	blockHost(hostName)
-	{
+	blockHost(hostName) {
 		if (!hostName) {
 			return false;
 		}
@@ -48,7 +47,8 @@ class Blocklist
 			return this.domains[hostName];
 		}
 
-		let domainGuess = parts.slice(-2).join('.');
+		let domainGuess = parts.slice(-2)
+			.join('.');
 		if (this.domains[domainGuess]) {
 			return true;
 		}
@@ -62,25 +62,22 @@ class Blocklist
 		return false;
 	}
 
-	blockExtension(fileExt)
-	{
+	blockExtension(fileExt) {
 		if (!fileExt) {
 			return false;
 		}
 		return this.fileTypes[fileExt];
 	}
 
-	blockUrl(urlString)
-	{
+	blockUrl(urlString) {
 		return this.fileTypes[fileExt];
 	}
 
-	async loadHosts()
-	{
+	async loadHosts() {
 		let readLines = function (file, lineHandler) {
-			const reader =readline.createInterface({
+			const reader = readline.createInterface({
 				input: fs.createReadStream(file, {encoding: 'utf8'}),
-				crlfDelay: Infinity
+				crlfDelay: Infinity,
 			});
 
 			reader.on('line', lineHandler);
@@ -114,5 +111,3 @@ class Blocklist
 		debug('domains-read:', domainCount);
 	}
 }
-
-module.exports = Blocklist;

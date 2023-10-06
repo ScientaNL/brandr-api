@@ -1,12 +1,11 @@
-const fetch = require('node-fetch');
-const imageType = require('image-type');
-const isSvg = require('is-svg');
-const icoToPng = require('ico-to-png');
-const hasha = require('hasha');
-const sharp = require('sharp');
+import fetch from 'node-fetch';
+import imageType from 'image-type';
+import isSvg from 'is-svg';
+import icoToPng from 'ico-to-png';
+import hasha from 'hasha';
+import sharp from 'sharp';
 
-class AbstractStrategy
-{
+export default class AbstractStrategy {
 	static getId() {
 		throw new Error(`Please implement getId method in strategy`);
 	}
@@ -15,7 +14,7 @@ class AbstractStrategy
 		throw new Error(`Please implement getParserFilesToInject method in strategy`);
 	}
 
-	parsePage () {
+	parsePage() {
 		throw new Error(`Please implement parsePage method in strategy`);
 	};
 
@@ -36,7 +35,7 @@ class AbstractStrategy
 			origin: null,
 		};
 
-		if(src.match(/data:image\/[a-zA-Z0-9+]*?;base64,/)) {
+		if (src.match(/data:image\/[a-zA-Z0-9+]*?;base64,/)) {
 			let data = src.split(",", 2)[1] || "";
 
 			result.buffer = Buffer.from(data, 'base64');
@@ -50,21 +49,23 @@ class AbstractStrategy
 
 		const imageInfo = imageType(result.buffer);
 
-		if(imageInfo) {
-			switch(imageInfo.ext) {
+		if (imageInfo) {
+			switch (imageInfo.ext) {
 				case "jpg":
 				case "png":
 				case "gif":
 					result.extension = imageInfo.ext;
 					break;
 				case "webp":
-					result.buffer = await sharp(result.buffer).png().toBuffer();
+					result.buffer = await sharp(result.buffer)
+						.png()
+						.toBuffer();
 					result.extension = "png";
 					break;
 				case"ico":
 					let pngBuffer = await this.parseIco(result.buffer, src);
 
-					if(pngBuffer === null) {
+					if (pngBuffer === null) {
 						return null;
 					}
 
@@ -74,7 +75,7 @@ class AbstractStrategy
 				default:
 					return null;
 			}
-		} else if(isSvg(result.buffer) === true) {
+		} else if (isSvg(result.buffer) === true) {
 			result.extension = "svg";
 		} else {
 			return null;
@@ -86,11 +87,11 @@ class AbstractStrategy
 	async parseSvg(svg) {
 		let buffer = Buffer.from(svg);
 
-		if(isSvg(buffer) === true) {
+		if (isSvg(buffer) === true) {
 			return {
 				buffer: buffer,
 				extension: "svg",
-				origin: "[inline]"
+				origin: "[inline]",
 			};
 		} else {
 			return null;
@@ -103,7 +104,7 @@ class AbstractStrategy
 			let imageInfo = imageType(pngBuffer);
 
 			return (imageInfo.ext === "png") ? pngBuffer : null;
-		} catch(e) {
+		} catch (e) {
 			console.log(e);
 
 			return null;
@@ -115,7 +116,7 @@ class AbstractStrategy
 		try {
 			let imageDefinition = await this.downloadFile(url);
 
-			if(!imageDefinition) {
+			if (!imageDefinition) {
 				return null;
 			}
 
@@ -124,9 +125,9 @@ class AbstractStrategy
 				hash: this.getBufferHash(imageDefinition.buffer),
 				extension: imageDefinition.extension,
 				origin: imageDefinition.origin,
-				weight: weight
+				weight: weight,
 			};
-		} catch(e) {
+		} catch (e) {
 			console.log(e);
 
 			return null;
@@ -137,5 +138,3 @@ class AbstractStrategy
 		return hasha(buffer, {algorithm: 'md5'});
 	}
 }
-
-module.exports = AbstractStrategy;

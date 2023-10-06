@@ -3,7 +3,7 @@ class StyleColorsStrategyParser {
 	grayDev = 4;
 	colorCount = {
 		'colors': {},
-		'grays': {}
+		'grays': {},
 	};
 	typeWeight = {
 		'links-color': 1,
@@ -11,13 +11,21 @@ class StyleColorsStrategyParser {
 		'buttons-color': 1,
 		'buttons-backgroundColor': 30,
 		'headers-color': 10,
-		'header-color': 20
+		'header-color': 20,
 	};
 
 	typeSelectors = {
 		'links': [
-			{selector: '.active > a, .active > * > a', weight: 50, styles: ['color', 'backgroundColor']},
-			{selector: 'header a', weight: 10, styles: ['color', 'backgroundColor']}
+			{
+				selector: '.active > a, .active > * > a',
+				weight: 50,
+				styles: ['color', 'backgroundColor'],
+			},
+			{
+				selector: 'header a',
+				weight: 10,
+				styles: ['color', 'backgroundColor'],
+			},
 		],
 		'buttons': [
 			{
@@ -28,7 +36,8 @@ class StyleColorsStrategyParser {
 					'header input [type="button"]',
 					'header input [type="submit"]',
 				].join(','),
-				weight: 20, styles: ['color', 'backgroundColor']
+				weight: 20,
+				styles: ['color', 'backgroundColor'],
 			},
 			{
 				selector: [
@@ -38,19 +47,44 @@ class StyleColorsStrategyParser {
 					'input [type="button"]',
 					'input [type="submit"]',
 				].join(','),
-				weight: 10, styles: ['color', 'backgroundColor']
-			}
+				weight: 10,
+				styles: ['color', 'backgroundColor'],
+			},
 		],
 		'header': [
-			{selector: 'header [role="banner"]', weight: 1, styles: ['backgroundColor']},
+			{
+				selector: 'header [role="banner"]',
+				weight: 1,
+				styles: ['backgroundColor'],
+			},
 		],
 		'headers': [
-			{selector: 'h1', weight: 40, styles: ['color']},
-			{selector: 'h1 *', weight: 10, styles: ['color']},
-			{selector: 'h2', weight: 20, styles: ['color']},
-			{selector: 'h2 *', weight: 5, styles: ['color']},
-			{selector: 'h3', weight: 10, styles: ['color']}
-		]
+			{
+				selector: 'h1',
+				weight: 40,
+				styles: ['color'],
+			},
+			{
+				selector: 'h1 *',
+				weight: 10,
+				styles: ['color'],
+			},
+			{
+				selector: 'h2',
+				weight: 20,
+				styles: ['color'],
+			},
+			{
+				selector: 'h2 *',
+				weight: 5,
+				styles: ['color'],
+			},
+			{
+				selector: 'h3',
+				weight: 10,
+				styles: ['color'],
+			},
+		],
 	};
 
 	parse() {
@@ -100,7 +134,7 @@ class StyleColorsStrategyParser {
 			}
 
 			for (let color in this.colorCount[colorType]) {
-				sortable.push([color, this.colorCount[colorType][color] / styleTypes])
+				sortable.push([color, this.colorCount[colorType][color] / styleTypes]);
 			}
 
 			sortable = sortable.sort(function (a, b) {

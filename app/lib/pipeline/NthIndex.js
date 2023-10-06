@@ -1,4 +1,4 @@
-class NthIndex {
+export default class NthIndex {
 
 	constructor(index) {
 		this.index = index;
@@ -8,5 +8,3 @@ class NthIndex {
 		return data[this.index] ? data[this.index] : null;
 	}
 }
-
-module.exports = NthIndex;

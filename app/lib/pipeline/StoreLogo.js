@@ -1,6 +1,6 @@
-const fs = require('fs');
+import fs from 'fs';
 
-class StoreLogo {
+export default class StoreLogo {
 
 	constructor(storagePath, host) {
 		this.storagePath = storagePath;
@@ -9,7 +9,7 @@ class StoreLogo {
 
 	async process(data) {
 		let result = [];
-		for(let logo of data) {
+		for (let logo of data) {
 			result.push(await this.storeLogo(logo));
 		}
 
@@ -22,8 +22,8 @@ class StoreLogo {
 		let imageEndpoint = `${this.host}/${filename}`;
 
 		try {
-			await fs.promises.access(imagePath)
-		} catch(e) {
+			await fs.promises.access(imagePath);
+		} catch (e) {
 			await fs.promises.writeFile(imagePath, logo.buffer);
 		}
 
@@ -31,7 +31,7 @@ class StoreLogo {
 	}
 }
 
-class StoredImage {
+export class StoredImage {
 
 	constructor(logo, imagePath, imageEndpoint) {
 		this.logo = logo;
@@ -43,6 +43,3 @@ class StoredImage {
 		return this.imageEndpoint;
 	}
 }
-
-module.exports = StoreLogo;
-

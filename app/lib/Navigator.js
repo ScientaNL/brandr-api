@@ -1,10 +1,11 @@
-const puppeteer = require('puppeteer');
-const debug = require('debug')('navigator');
-debug.log = console.log.bind(console);
-const Blocklist = require('./Blocklist');
+import puppeteer from 'puppeteer';
+import debugPackage from 'debug';
+import Blocklist from './Blocklist.js';
 
-class Navigator
-{
+const debug = debugPackage('navigator');
+debugPackage.log = console.log.bind(console);
+
+export default class Navigator {
 	constructor() {
 		this.pageLoadTimeout = 5000;
 
@@ -12,15 +13,14 @@ class Navigator
 		this.browserPromise = null;
 
 		this.defaultPuppeteerOptions = {
-			executablePath: 'google-chrome-unstable',
 			args: ['--no-sandbox', '--disable-dev-shm-usage'],
 			defaultViewport: {
 				width: 1920,
-				height: 1080
+				height: 1080,
 			},
-			headless: true,
-			devtools: true
-		}
+			headless: 'new',
+			devtools: true,
+		};
 	}
 
 	async getInfo() {
@@ -34,8 +34,8 @@ class Navigator
 			browser: {
 				version: browser.version(),
 				userAgent: browser.userAgent(),
-			}
-		}
+			},
+		};
 	}
 
 	async initBlockList() {
@@ -51,12 +51,12 @@ class Navigator
 	 * Custom load await logic. Wait for load event, but if it doesn't come within time, accept domcontentloaded as
 	 * valid event as a marker of page load.
 	 */
-	async newPage(uri)
-	{
+	async newPage(uri) {
 		const browser = await this.getBrowser();
 
 		const page = await browser.newPage();
-		const cdp = await page.target().createCDPSession();
+		const cdp = await page.target()
+			.createCDPSession();
 		await cdp.send('DOM.enable');
 		await cdp.send('CSS.enable');
 
@@ -67,12 +67,21 @@ class Navigator
 			let domcontentloaded = false;
 			page.on("domcontentloaded", () => domcontentloaded = true);
 
-			let navigationResponse = page.goto(uri, {timeout: this.pageLoadTimeout, waitUntil: 'networkidle0'});
+			let navigationResponse = page.goto(uri, {
+				timeout: this.pageLoadTimeout,
+				waitUntil: 'networkidle0',
+			});
 			navigationResponse.then(() => {
-				resolve({page: page, cdp: cdp})
+				resolve({
+					page: page,
+					cdp: cdp,
+				});
 			}, (e) => {
-				if(domcontentloaded === true) {
-					resolve({page: page, cdp: cdp});
+				if (domcontentloaded === true) {
+					resolve({
+						page: page,
+						cdp: cdp,
+					});
 				} else {
 					reject(e);
 				}
@@ -98,9 +107,8 @@ class Navigator
 		page.on('requestfailed', this.pageRequestFailedHandler());
 	}
 
-	async getBrowser()
-	{
-		if(this.browserPromise) {
+	async getBrowser() {
+		if (this.browserPromise) {
 			return this.browserPromise;
 		}
 
@@ -128,10 +136,13 @@ class Navigator
 
 			let hostName = null,
 				fileExt = null,
-				rqParts = request.url().split('/');
+				rqParts = request.url()
+					.split('/');
 			if (rqParts.length > 2) {
 				hostName = rqParts[2];
-				let filePathParts = rqParts[rqParts.length - 1].split('?').shift().split('.');
+				let filePathParts = rqParts[rqParts.length - 1].split('?')
+					.shift()
+					.split('.');
 				if (filePathParts.length > 1) {
 					fileExt = filePathParts.pop();
 				}
@@ -141,12 +152,10 @@ class Navigator
 			if (this.blocklist.blockExtension(fileExt)) {
 				debug.extend('notice')('page-request-blocked:', fileExt, request.url());
 				request.abort();
-			}
-			else if (differentHost && this.blocklist.blockHost(hostName)) {
+			} else if (differentHost && this.blocklist.blockHost(hostName)) {
 				debug.extend('notice')('page-request-blocked:', hostName, request.url());
 				request.abort();
-			}
-			else {
+			} else {
 				if (differentHost) {
 					debug.extend('info')('page-request-not-blocked:', hostName, request.url());
 				}
@@ -167,5 +176,3 @@ class Navigator
 		};
 	}
 }
-
-module.exports = Navigator;

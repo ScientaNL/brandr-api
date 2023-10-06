@@ -1,15 +1,19 @@
-const AbstractStrategy = require('../AbstractStrategy');
+import AbstractStrategy from '../AbstractStrategy.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-class FacebookLogoStrategy extends AbstractStrategy
-{
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+
+export default class FacebookLogoStrategy extends AbstractStrategy {
 	static getId() {
 		return 'facebook-logo';
 	}
 
 	getParserFilesToInject() {
 		return [
-			__dirname + "/../AbstractMetaExtractorParser.js",
-			__dirname + "/FacebookLogoStrategyParser.js"
+			dirname + "/../AbstractMetaExtractorParser.js",
+			dirname + "/FacebookLogoStrategyParser.js",
 		];
 	}
 
@@ -17,7 +21,7 @@ class FacebookLogoStrategy extends AbstractStrategy
 	 * This method is executed in the context of the Headless Chrome Browser
 	 * @returns {Array}
 	 */
-	parsePage () {
+	parsePage() {
 		let parser = new FacebookLogoStrategyParser(document);
 		return parser.parse();
 	}
@@ -25,17 +29,17 @@ class FacebookLogoStrategy extends AbstractStrategy
 	async processParserResult(parserResult) {
 
 		let images = [];
-		for(let result of parserResult) {
-			if(!result.id) {
+		for (let result of parserResult) {
+			if (!result.id) {
 				continue;
 			}
 
 			let definition = await this.processDownload(
 				`https://graph.facebook.com/${result.id}/picture?type=large`,
-				result.weight
+				result.weight,
 			);
 
-			if(definition) {
+			if (definition) {
 				images.push((definition));
 			}
 		}
@@ -43,5 +47,3 @@ class FacebookLogoStrategy extends AbstractStrategy
 		return images;
 	}
 }
-
-module.exports = FacebookLogoStrategy;
