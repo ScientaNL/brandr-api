@@ -1,15 +1,19 @@
-const AbstractStrategy = require('../AbstractStrategy');
+import AbstractStrategy from '../AbstractStrategy.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-class MetaLogoStrategy extends AbstractStrategy
-{
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+
+export default class MetaLogoStrategy extends AbstractStrategy {
 	static getId() {
 		return 'meta-logo';
 	}
 
 	getParserFilesToInject() {
 		return [
-			__dirname + "/../AbstractMetaExtractorParser.js",
-			__dirname + "/MetaLogoStrategyParser.js"
+			dirname + "/../AbstractMetaExtractorParser.js",
+			dirname + "/MetaLogoStrategyParser.js",
 		];
 	}
 
@@ -17,7 +21,7 @@ class MetaLogoStrategy extends AbstractStrategy
 	 * This method is executed in the context of the Headless Chrome Browser
 	 * @returns {Array}
 	 */
-	parsePage () {
+	parsePage() {
 		let parser = new MetaLogoStrategyParser(document);
 		return parser.parse();
 	};
@@ -25,14 +29,14 @@ class MetaLogoStrategy extends AbstractStrategy
 	async processParserResult(parserResult) {
 
 		let images = [];
-		for(let result of parserResult) {
-			if(!result.src) {
+		for (let result of parserResult) {
+			if (!result.src) {
 				continue;
 			}
 
-			let definition = await this.processDownload(result.src,	result.weight);
+			let definition = await this.processDownload(result.src, result.weight);
 
-			if(definition) {
+			if (definition) {
 				images.push((definition));
 			}
 		}
@@ -40,5 +44,3 @@ class MetaLogoStrategy extends AbstractStrategy
 		return images;
 	}
 }
-
-module.exports = MetaLogoStrategy;

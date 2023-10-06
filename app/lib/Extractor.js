@@ -1,28 +1,22 @@
-const debug = require('debug')('extractor');
+import debugPackage from 'debug';
+import Navigator from './Navigator.js';
+import MetaLogoStrategy from './extractors/meta-logo/MetaLogoStrategy.js';
+import StyleColorsStrategy from './extractors/style-colors/StyleColorsStrategy.js';
+import DomLogoStrategy from './extractors/dom-logo/DomLogoStrategy.js';
+import FacebookLogoStrategy from './extractors/facebook-logo/FacebookLogoStrategy.js';
+import TwitterLogoStrategy from './extractors/twitter-logo/TwitterLogoStrategy.js';
+import Pipeline from './pipeline/Pipeline.js';
+import ArrayMerger from './pipeline/ArrayMerger.js';
+import ArrayWeighSort from './pipeline/ArrayWeighSort.js';
+import ArrayUnique from './pipeline/ArrayUnique.js';
+import ArraySlice from './pipeline/ArraySlice.js';
+import StoreLogo from './pipeline/StoreLogo.js';
+import NthIndex from './pipeline/NthIndex.js';
+
+const debug = debugPackage('extractor');
 debug.log = console.log.bind(console);
 
-const Navigator = require('./Navigator');
-
-const path = require("path");
-
-const MetaLogoStrategy = require('./extractors/meta-logo/MetaLogoStrategy');
-const StyleColorsStrategy = require('./extractors/style-colors/StyleColorsStrategy');
-
-const DomLogoStrategy = require('./extractors/dom-logo/DomLogoStrategy');
-const FacebookLogoStrategy = require('./extractors/facebook-logo/FacebookLogoStrategy');
-const TwitterLogoStrategy = require('./extractors/twitter-logo/TwitterLogoStrategy');
-
-const Pipeline = require('./pipeline/Pipeline');
-const ArrayMerger = require('./pipeline/ArrayMerger');
-const ArrayWeighSort = require('./pipeline/ArrayWeighSort');
-const ArrayUnique = require('./pipeline/ArrayUnique');
-const ArraySlice = require('./pipeline/ArraySlice');
-const StoreLogo = require('./pipeline/StoreLogo');
-const LogoColorAggregator = require('./pipeline/LogoColorAggregator');
-const NthIndex = require('./pipeline/NthIndex');
-
-class Extractor
-{
+export default class Extractor {
 	constructor(storagePath, host) {
 		this.extractors = {};
 		this.pipelines = [];
@@ -40,7 +34,7 @@ class Extractor
 				DomLogoStrategy.getId(),
 				MetaLogoStrategy.getId(),
 				FacebookLogoStrategy.getId(),
-				TwitterLogoStrategy.getId()
+				TwitterLogoStrategy.getId(),
 			]),
 			new ArrayWeighSort(),
 			new ArrayUnique(),
@@ -54,7 +48,7 @@ class Extractor
 			new ArrayUnique(),
 			new ArraySlice(0, 1),
 			new StoreLogo(storagePath, host),
-			new NthIndex(0)
+			new NthIndex(0),
 		]));
 
 		this.registerPipeline(new Pipeline('social-logo', [
@@ -63,7 +57,7 @@ class Extractor
 			new ArrayUnique(),
 			new ArraySlice(0, 1),
 			new StoreLogo(storagePath, host),
-			new NthIndex(0)
+			new NthIndex(0),
 		]));
 
 		this.registerPipeline(new Pipeline('meta-logo', [
@@ -72,11 +66,11 @@ class Extractor
 			new ArrayUnique(),
 			new ArraySlice(0, 1),
 			new StoreLogo(storagePath, host),
-			new NthIndex(0)
+			new NthIndex(0),
 		]));
 
 		this.registerPipeline(new Pipeline('site-style', [
-			new ArrayMerger([StyleColorsStrategy.getId()])
+			new ArrayMerger([StyleColorsStrategy.getId()]),
 		]));
 
 		// this.registerPipeline(new Pipeline('logo-color', [
@@ -102,47 +96,50 @@ class Extractor
 
 	async init(settings) {
 		if (settings.useBlockList) {
-			this.navigator.initBlockList();
+			await this.navigator.initBlockList();
 		}
 	}
 
 	async getInfo() {
 		let navInfo = await this.navigator.getInfo();
 		return {
-			puppeteer: navInfo
-		}
+			puppeteer: navInfo,
+		};
 	}
 
 	async extract(uri) {
 		debug('extracting:', uri);
 
-		console.time("pageLoad");
-		const result = await this.navigator.newPage(uri);
-		const page = result.page;
-		const cdp = result.cdp;
-		console.timeEnd("pageLoad");
+		let timeNewPage = `${new Date()} [STATS] loaded page in`;
+		console.time(timeNewPage);
+		const {
+			page,
+			cdp,
+		} = await this.navigator.newPage(uri);
+		console.timeEnd(timeNewPage);
 
-		console.time("extractors");
+		const timeRunExtractors = `${new Date()} [STATS] ran extractor in`;
+		console.time(timeRunExtractors);
 		let extractions = await this.runExtractors(page, cdp);
-		console.timeEnd("extractors");
+		console.timeEnd(timeRunExtractors);
 
 		if (!page.isClosed()) {
 			await page.close();
 		}
 
-		console.time("pipelines");
+		let timePipelineProcesses = `${new Date()} [STATS] ran pipeline processes in`;
+		console.time(timePipelineProcesses);
 		let results = {};
-		for(let pipeline of this.pipelines) {
+		for (let pipeline of this.pipelines) {
 			let pipelineResult = await pipeline.process(extractions);
 			results = {...results, ...pipelineResult};
 		}
-		console.timeEnd("pipelines");
+		console.timeEnd(timePipelineProcesses);
 
 		return results;
 	}
 
 	async runExtractors(page, cdp) {
-
 		let results = {};
 		let addedScripts = [];
 		for (let groupName in this.extractors) {
@@ -153,9 +150,7 @@ class Extractor
 			let extractor = this.extractors[groupName];
 
 			for (let filePath of extractor.getParserFilesToInject()) {
-				filePath = path.resolve(filePath);
-
-				if(addedScripts.indexOf(filePath) === -1) {
+				if (addedScripts.indexOf(filePath) === -1) {
 					await page.addScriptTag({path: filePath});
 					addedScripts.push(filePath);
 				}
@@ -167,5 +162,3 @@ class Extractor
 		return results;
 	}
 }
-
-module.exports = Extractor;

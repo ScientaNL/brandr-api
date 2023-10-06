@@ -1,20 +1,24 @@
-const AbstractStrategy = require('../AbstractStrategy');
+import AbstractStrategy from '../AbstractStrategy.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-class StyleColorsStrategy extends AbstractStrategy
-{
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+
+export default class StyleColorsStrategy extends AbstractStrategy {
 	static getId() {
 		return 'style-colors';
 	}
 
 	getParserFilesToInject() {
-		return [__dirname + "/StyleColorsStrategyParser.js"];
+		return [dirname + "/StyleColorsStrategyParser.js"];
 	}
 
 	/**
 	 * This method is executed in the context of the Headless Chrome Browser
 	 * @returns {Array}
 	 */
-	parsePage () {
+	parsePage() {
 		let parser = new StyleColorsStrategyParser();
 		return parser.parse();
 	};
@@ -24,5 +28,3 @@ class StyleColorsStrategy extends AbstractStrategy
 		return parserResult;
 	}
 }
-
-module.exports = StyleColorsStrategy;

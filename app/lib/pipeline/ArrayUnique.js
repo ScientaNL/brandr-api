@@ -1,9 +1,9 @@
-class ArrayUnique {
+export default class ArrayUnique {
 
 	async process(data) {
 		let result = {};
-		for(let item of data) {
-			if(result.hasOwnProperty(item.hash) === false) {
+		for (let item of data) {
+			if (result.hasOwnProperty(item.hash) === false) {
 				result[item.hash] = item;
 			}
 		}
@@ -11,5 +11,3 @@ class ArrayUnique {
 		return Object.values(result);
 	}
 }
-
-module.exports = ArrayUnique;

@@ -1,4 +1,4 @@
-class DOMLogoStrategyParser {
+class DomLogoStrategyParser {
 	document;
 
 	minWeight = .5;
@@ -13,7 +13,7 @@ class DOMLogoStrategyParser {
 
 	weighingStrategies = [
 		(data, element, weight) => { // Do I tell you I am indeed a logo?
-			if(element.getAttribute("itemprop") === "logo") {
+			if (element.getAttribute("itemprop") === "logo") {
 				weight += 1;
 				this.log(`Because I have an itemprop, I added 1 now counting ${weight}`);
 			}
@@ -21,7 +21,6 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { // Am I part of a link?
-			let siteRoot = (this.document.location.origin + this.document.location.pathname).replace(/\/$/g, "");
 			let cursor = element;
 			let linkFactor = .24;
 			do {
@@ -39,10 +38,11 @@ class DOMLogoStrategyParser {
 					this.log(`Because I have a logo class, I added ${linkFactor} now counting ${weight}`);
 				}
 
-				if(('' + cursor.getAttribute("id")).toLowerCase() ===  "logo") {
+				if (('' + cursor.getAttribute("id")).toLowerCase() === "logo") {
 					weight += linkFactor * 6;
-					this.log(`Because I have a logo id, I added ${linkFactor*6} now counting ${weight}`);
-				} else if(('' + cursor.getAttribute("id")).toLowerCase().indexOf("logo") !==  -1) {
+					this.log(`Because I have a logo id, I added ${linkFactor * 6} now counting ${weight}`);
+				} else if (('' + cursor.getAttribute("id")).toLowerCase()
+					.indexOf("logo") !== -1) {
 					weight += linkFactor * 1.5;
 					this.log(`Because ID contains logo, I added ${linkFactor} now counting ${weight}`);
 				}
@@ -53,12 +53,14 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { // Do I have the word logo in my url?
-			if(!data.src) {
+			if (!data.src) {
 				return weight;
 			}
 
-			let urlParts = data.src.toLowerCase().split("/");
-			urlParts = urlParts.slice(3).reverse(); //Strip the protocol and domain
+			let urlParts = data.src.toLowerCase()
+				.split("/");
+			urlParts = urlParts.slice(3)
+				.reverse(); //Strip the protocol and domain
 
 			let wordInUrlFactor = .5;
 			for (let part of urlParts) {
@@ -83,7 +85,7 @@ class DOMLogoStrategyParser {
 				this.log(`Because I am very abovy. I added .25 now counting ${weight}`);
 			}
 
-			if(boundingClientRect.left > 0 && boundingClientRect.right < this.documentClientRect.right) {
+			if (boundingClientRect.left > 0 && boundingClientRect.right < this.documentClientRect.right) {
 				let factor = .4 * (1 - element.getBoundingClientRect().left / this.documentClientRect.right);
 				weight += factor;
 				this.log(`Because I appreciate a logo on the left (LTR). I added ${factor} now counting ${weight}`);
@@ -101,7 +103,7 @@ class DOMLogoStrategyParser {
 			}
 
 			let siteName = this.getWebsiteName();
-			if(siteName && (alt.indexOf(siteName) !== -1 || title.indexOf(siteName) !== -1)) {
+			if (siteName && (alt.indexOf(siteName) !== -1 || title.indexOf(siteName) !== -1)) {
 				weight += .2;
 				this.log(`Because there is in my alt or title the deduced website name is found. I added .2 now counting ${weight}`);
 			}
@@ -111,10 +113,10 @@ class DOMLogoStrategyParser {
 		(data, element, weight) => { //Maybe I'm too small to be a logo?
 			let boundingRect = element.getBoundingClientRect();
 
-			if(boundingRect.width < 16 || boundingRect.height < 16) {
-				weight = 0 ;
+			if (boundingRect.width < 16 || boundingRect.height < 16) {
+				weight = 0;
 				this.log(`Too small. I hard reset now counting ${weight}`);
-			} else if(boundingRect.width < 24 && boundingRect.height < 24) {
+			} else if (boundingRect.width < 24 && boundingRect.height < 24) {
 				weight -= .4;
 				this.log(`Too a bit tiny. removed .4. now counting ${weight}`);
 			}
@@ -126,22 +128,23 @@ class DOMLogoStrategyParser {
 			let nav = false;
 			let cookie = false;
 
-			for(let parent of DOMLogoStrategyParser.getElementParents(element)) {
-				if(parent === this.document.body) { // Don't use the body
+			for (let parent of DomLogoStrategyParser.getElementParents(element)) {
+				if (parent === this.document.body) { // Don't use the body
 					break;
 				}
 
-				if(header === false && parent.tagName.toLowerCase() === "header") {
+				if (header === false && parent.tagName.toLowerCase() === "header") {
 					weight += .15;
 					header = true;
 					this.log(`I reside in a header. adding .15. now counting ${weight}`);
-				} else if(nav === false && parent.tagName.toLowerCase() === "nav") {
+				} else if (nav === false && parent.tagName.toLowerCase() === "nav") {
 					weight += .1;
 					this.log(`I reside in a nav. adding .1 now. counting ${weight}`);
 					nav = true;
-				} else if(cookie === false) {
+				} else if (cookie === false) {
 					// Could it be an annoying cookie consent message?
-					if(('' + parent.getAttribute("class") + parent.getAttribute("id")).toLowerCase().indexOf("cookie") !== -1) {
+					if (('' + parent.getAttribute("class") + parent.getAttribute("id")).toLowerCase()
+						.indexOf("cookie") !== -1) {
 						weight -= .15;
 						cookie = true;
 						this.log(`Maybe, I reside in a cookie consent message. removing .15. now counting ${weight}`);
@@ -152,16 +155,19 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { //My image is named after the title
-			if(!data.src) {
+			if (!data.src) {
 				return weight;
 			}
 
-			let titlePart = this.document.title.split(/[|.:\-,_]/)[0].toLowerCase().trim();
+			let titlePart = this.document.title.split(/[|.:\-,_]/)[0].toLowerCase()
+				.trim();
 
-			let urlParts = data.src.toLowerCase().split("/");
-			urlParts = urlParts.slice(3).reverse(); //Strip the protocol and domain
+			let urlParts = data.src.toLowerCase()
+				.split("/");
+			urlParts = urlParts.slice(3)
+				.reverse(); //Strip the protocol and domain
 
-			if(urlParts[0] && urlParts[0].indexOf(titlePart) !== -1) { //We have a title match
+			if (urlParts[0] && urlParts[0].indexOf(titlePart) !== -1) { //We have a title match
 				weight += .15;
 				this.log(`My title contains a part of the leading site title. adding .15 now counting ${weight}`);
 			}
@@ -169,13 +175,16 @@ class DOMLogoStrategyParser {
 			return weight;
 		},
 		(data, element, weight) => { //Am i a sprite?
-			if(!data.src) {
+			if (!data.src) {
 				return weight;
 			}
 
-			let url = data.src.toLowerCase().split("/").slice(3).join("/");
+			let url = data.src.toLowerCase()
+				.split("/")
+				.slice(3)
+				.join("/");
 
-			if(url.indexOf("sprite") !== -1) {
+			if (url.indexOf("sprite") !== -1) {
 				weight -= .5;
 				this.log(`Url contains the word sprite. Subtracting .5. now counting ${weight}`);
 			}
@@ -187,7 +196,6 @@ class DOMLogoStrategyParser {
 
 	constructor(document) {
 		this.document = document;
-
 		this.siteRoot = (this.document.location.origin + this.document.location.pathname).replace(/\/$/g, "");
 		this.documentClientRect = this.document.body.getBoundingClientRect();
 	}
@@ -205,16 +213,16 @@ class DOMLogoStrategyParser {
 		});
 
 		let uniqueLogos = {};
-		for(let logo of items) {
+		for (let logo of items) {
 			let key = JSON.stringify(logo.data);
-			if(!uniqueLogos[key]) {
+			if (!uniqueLogos[key]) {
 				uniqueLogos[key] = logo;
 			}
 		}
 
 		let logos = [];
-		for(let logo of Object.values(uniqueLogos)) {
-			if(logo.weight < this.minWeight) {
+		for (let logo of Object.values(uniqueLogos)) {
+			if (logo.weight < this.minWeight) {
 				continue;
 			}
 
@@ -224,9 +232,9 @@ class DOMLogoStrategyParser {
 				logo: logo.data,
 				dimensions: {
 					width: logoBoundingClientRect.width,
-					height: logoBoundingClientRect.height
+					height: logoBoundingClientRect.height,
 				},
-				weight: logo.weight
+				weight: logo.weight,
 			});
 		}
 
@@ -240,9 +248,9 @@ class DOMLogoStrategyParser {
 			{
 				acceptNode: function (node) {
 					return NodeFilter.FILTER_ACCEPT;
-				}
+				},
 			},
-			false
+			false,
 		);
 	}
 
@@ -268,10 +276,10 @@ class DOMLogoStrategyParser {
 			while (logoClassSubtreeWalker.nextNode()) {
 				logos = [...logos, ...this.parseComputedStyles(logoClassSubtreeWalker.currentNode)];
 			}
-		} else if(this.hasLogoBackground(element)) { // No logo class? Try image file names
+		} else if (this.hasLogoBackground(element)) { // No logo class? Try image file names
 			logos = [...logos, ...this.parseComputedStyles(element)];
 
-		} else if(element.tagName.toLowerCase() === "a" && element.href.replace(/\/$/g, "") === this.siteRoot) { // Are we a link to home? Be desperate to resolve images
+		} else if (element.tagName.toLowerCase() === "a" && element.href.replace(/\/$/g, "") === this.siteRoot) { // Are we a link to home? Be desperate to resolve images
 
 			logos = [...logos, ...this.parseComputedStyles(element)];
 
@@ -305,28 +313,37 @@ class DOMLogoStrategyParser {
 				if (maxItem !== -Infinity) {
 					logos.push(
 						this.createLogoMatch(
-							{type: 'file', src: this.convertUrlToAbsolute(srcsetItems[descriptor][maxItem])},
+							{
+								type: 'file',
+								src: this.convertUrlToAbsolute(srcsetItems[descriptor][maxItem]),
+							},
 							element,
-							.3
-						)
+							.3,
+						),
 					);
 				}
 			}
 		} else if (src.match(/^data:image\/(?:png|jpg|gif|webp);base64,/i)) {
 			logos.push(
 				this.createLogoMatch(
-					{type: 'file', src: src},
+					{
+						type: 'file',
+						src: src,
+					},
 					element,
-					.2
-				)
+					.2,
+				),
 			);
-		} else if(src) {
+		} else if (src) {
 			logos.push(
 				this.createLogoMatch(
-					{type: 'file', src: this.convertUrlToAbsolute(src)},
+					{
+						type: 'file',
+						src: this.convertUrlToAbsolute(src),
+					},
 					element,
-					.2
-				)
+					.2,
+				),
 			);
 		}
 
@@ -336,15 +353,15 @@ class DOMLogoStrategyParser {
 	parseSVG(element) {
 
 		// Check if the current SVG is a subset of an SVG image.
-		for(let parent of DOMLogoStrategyParser.getElementParents(element)) {
-			if(parent.tagName.toLowerCase() === "svg") {
+		for (let parent of DomLogoStrategyParser.getElementParents(element)) {
+			if (parent.tagName.toLowerCase() === "svg") {
 				return [];
 			}
 		}
 
 		let containedImages = element.querySelectorAll(":scope > image[*|href]");
 
-		if(containedImages.length > 0) {
+		if (containedImages.length > 0) {
 			let logos = [];
 
 			containedImages.forEach((image) => logos = [...logos, ...this.parseSVGImage(image, element)]);
@@ -354,10 +371,10 @@ class DOMLogoStrategyParser {
 			return this.parseInlineSVG(element);
 		}
 	}
-	
+
 	parseInlineSVG(element) {
 		let boundingClientRect = element.getBoundingClientRect();
-		let marker = "svg-mark-for-download-" + DOMLogoStrategyParser.inlineSvgMarker++;
+		let marker = "svg-mark-for-download-" + DomLogoStrategyParser.inlineSvgMarker++;
 
 		element.classList.add(marker);
 		element.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -366,20 +383,26 @@ class DOMLogoStrategyParser {
 		element.setAttribute("height", boundingClientRect.height);
 
 		return [this.createLogoMatch(
-			{type: 'svg', marker: marker},
+			{
+				type: 'svg',
+				marker: marker,
+			},
 			element,
-			.2
+			.2,
 		)];
 	}
 
 	parseSVGImage(imageElement, hostElement) {
 		let src = imageElement.getAttribute("xlink:href") || imageElement.getAttribute("href");
 
-		if(src) {
+		if (src) {
 			return [this.createLogoMatch(
-				{type: 'file', src: this.convertUrlToAbsolute(src)},
+				{
+					type: 'file',
+					src: this.convertUrlToAbsolute(src),
+				},
 				hostElement,
-				.2
+				.2,
 			)];
 		} else {
 			return [];
@@ -391,14 +414,17 @@ class DOMLogoStrategyParser {
 		let acceptedTypes = ["image/svg+xml", "image/png"];
 		let data = element.getAttribute("data");
 
-		if(acceptedTypes.indexOf(type) === -1 || !data) {
+		if (acceptedTypes.indexOf(type) === -1 || !data) {
 			return [];
 		}
 
 		return [this.createLogoMatch(
-			{type: 'file', src: this.convertUrlToAbsolute(data)},
+			{
+				type: 'file',
+				src: this.convertUrlToAbsolute(data),
+			},
 			element,
-			.2
+			.2,
 		)];
 	}
 
@@ -412,30 +438,41 @@ class DOMLogoStrategyParser {
 					try {
 						matches.push(
 							this.createLogoMatch(
-								{type: 'svg', svg: atob(url.substr(26).trim())},
+								{
+									type: 'svg',
+									svg: atob(url.substr(26)
+										.trim()),
+								},
 								element,
-								weightFactor
-							)
+								weightFactor,
+							),
 						);
-					} catch (e) {}
+					} catch (e) {
+					}
 				} else if (url.match(/data:image\/svg\+xml;charset.*?,/)) {
 					let data = url.split(",", 2)[1] || "";
 
 					matches.push(
 						this.createLogoMatch(
-							{type: 'svg', svg: decodeURIComponent(data)},
+							{
+								type: 'svg',
+								svg: decodeURIComponent(data),
+							},
 							element,
-							weightFactor
-						)
+							weightFactor,
+						),
 					);
 				}
 			} else {
 				matches.push(
 					this.createLogoMatch(
-						{type: 'file', src: url},
+						{
+							type: 'file',
+							src: url,
+						},
 						element,
-						weightFactor
-					)
+						weightFactor,
+					),
 				);
 			}
 
@@ -458,7 +495,8 @@ class DOMLogoStrategyParser {
 
 	hasLogoBackground(element) {
 		for (let url of this.getBackgroundImageUrls(element)) {
-			if(url.toLowerCase().indexOf("logo") !== -1) {
+			if (url.toLowerCase()
+				.indexOf("logo") !== -1) {
 				return true;
 			}
 		}
@@ -470,7 +508,7 @@ class DOMLogoStrategyParser {
 		return {
 			element: element,
 			data: data,
-			weight: this.calculateWeight(data, element, weight)
+			weight: this.calculateWeight(data, element, weight),
 		};
 	}
 
@@ -487,10 +525,11 @@ class DOMLogoStrategyParser {
 
 	calculateWeight(data, element, weight) {
 
-		this.loggingEnabled && console.group(`Weighing %s`, JSON.stringify(data).substr(0, 150));
+		this.loggingEnabled && console.group(`Weighing %s`, JSON.stringify(data)
+			.substr(0, 150));
 		this.log(`starting with ${weight}`);
 
-		for(let strategy of this.weighingStrategies) {
+		for (let strategy of this.weighingStrategies) {
 			weight = strategy(data, element, weight);
 		}
 
@@ -503,7 +542,7 @@ class DOMLogoStrategyParser {
 		// cursor = cursor.parentElement;
 		let parents = [];
 
-		while(cursor = cursor.parentElement) {
+		while (cursor = cursor.parentElement) {
 			parents.push(cursor);
 		}
 
@@ -511,7 +550,7 @@ class DOMLogoStrategyParser {
 	}
 
 	log(message) {
-		if(this.loggingEnabled === true) {
+		if (this.loggingEnabled === true) {
 			console.log(message);
 		}
 	}
@@ -519,11 +558,11 @@ class DOMLogoStrategyParser {
 	getBackgroundImageUrls(element) {
 
 		let urls = [];
-		for(let pseudoElt of [null, ":before", ":after"]) {
+		for (let pseudoElt of [null, ":before", ":after"]) {
 			let cssDeclaration = this.document.defaultView.getComputedStyle(element, pseudoElt);
 
-			for(let property of ["background-image", "content"]) {
-				if(pseudoElt === null && property === "content") {
+			for (let property of ["background-image", "content"]) {
+				if (pseudoElt === null && property === "content") {
 					continue;
 				}
 
@@ -550,12 +589,13 @@ class DOMLogoStrategyParser {
 		];
 
 		let splitText = (text) => {
-			return ('' + text).split(/[|.:\-,_\s]/).filter((word) => !!word.trim());
+			return ('' + text).split(/[|.:\-,_\s]/)
+				.filter((word) => !!word.trim());
 		};
 
 		let words = [];
-		for(let node of this.document.querySelectorAll(selectors.join(","))) {
-			switch(node.tagName.toLowerCase()) {
+		for (let node of this.document.querySelectorAll(selectors.join(","))) {
+			switch (node.tagName.toLowerCase()) {
 				case "meta":
 					words = [...words, ...splitText('' + node.getAttribute("content"))];
 					break;
@@ -571,9 +611,9 @@ class DOMLogoStrategyParser {
 
 		let wordCountMap = {};
 
-		for(let word of words) {
+		for (let word of words) {
 			word = word.toLowerCase();
-			if(!wordCountMap[word]) {
+			if (!wordCountMap[word]) {
 				wordCountMap[word] = 0;
 			}
 
@@ -581,13 +621,13 @@ class DOMLogoStrategyParser {
 		}
 
 		let mostUsedWord = "", highestCount = 1; //One word is no word
-		for(let word in wordCountMap) {
-			if(wordCountMap.hasOwnProperty(word) === false) {
+		for (let word in wordCountMap) {
+			if (wordCountMap.hasOwnProperty(word) === false) {
 				continue;
 			}
 
 			let wordCount = wordCountMap[word];
-			if(wordCount > highestCount) {
+			if (wordCount > highestCount) {
 				mostUsedWord = word;
 				highestCount = wordCount;
 			}
@@ -596,6 +636,3 @@ class DOMLogoStrategyParser {
 		return mostUsedWord;
 	}
 }
-
-// console.clear();
-// console.log((new DOMLogoStrategyParser(document)).parse());

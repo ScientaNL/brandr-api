@@ -6,9 +6,14 @@
 	"repository": "git@github.com:ScientaNL/brandr-api.git",
 	"author": "info@scienta.nl <info@scienta.nl>",
 	"private": true,
-	"type": "commonjs",
+	"type": "module",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon index.js"
+	},
 	"dependencies": {
 		"@koa/cors": "4.0.0",
+		"@vibrant/color": "^3.2.1-alpha.1",
 		"better-queue": "^3.8.12",
 		"debug": "^4.3.4",
 		"decode-ico": "^0.4.1",
@@ -29,8 +34,12 @@
 		"lodepng": "^2.2.0",
 		"nan": "^2.18.0",
 		"node-fetch": "^3.3.2",
+		"node-gyp": "^9.4.0",
 		"node-vibrant": "^3.2.1-alpha.1",
+		"nodemon": "^3.0.1",
+		"puppeteer": "^21.3.6",
 		"sharp": "^0.32.6",
 		"urijs": "^1.19.11"
-	}
+	},
+	"packageManager": "yarn@3.6.4"
 }

@@ -1,4 +1,4 @@
-class Pipeline {
+export default class Pipeline {
 
 	constructor(name, items) {
 		this.name = name;
@@ -6,7 +6,7 @@ class Pipeline {
 	}
 
 	async process(data) {
-		for(let item of this.items) {
+		for (let item of this.items) {
 			data = await item.process(data);
 		}
 
@@ -15,5 +15,3 @@ class Pipeline {
 		return result;
 	}
 }
-
-module.exports = Pipeline;

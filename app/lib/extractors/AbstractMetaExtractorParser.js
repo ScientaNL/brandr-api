@@ -42,7 +42,10 @@ class AbstractMetaExtractorParser {
 					result.weight = iq.weight;
 					matches.push(result);
 				} else if (result !== null && result !== undefined) {
-					matches.push({src: makeUrlAbsolute(result), weight: iq.weight});
+					matches.push({
+						src: makeUrlAbsolute(result),
+						weight: iq.weight,
+					});
 				}
 
 			});

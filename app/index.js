@@ -1,19 +1,19 @@
 /**
  * API app requires
  */
-const Koa = require('koa');
+import Koa from 'koa';
+import Router from 'koa-router';
+import serveStatic from 'koa-static';
+import logger from 'koa-logger';
+import json from 'koa-json';
+import cors from '@koa/cors';
+import bodyParser from 'koa-bodyparser';
+import conditional from 'koa-conditional-get';
+import etag from 'koa-etag';
+import debugPackage from 'debug';
+import Extractor from './lib/Extractor.js';
 
-const Router = require('koa-router');
-const serveStatic = require('koa-static');
-const logger = require('koa-logger');
-const json = require('koa-json');
-const cors = require('@koa/cors');
-const bodyParser = require('koa-bodyparser');
-
-const conditional = require('koa-conditional-get');
-const etag = require('koa-etag');
-
-const debug = require('debug')('http');
+const debug = debugPackage('http');
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; //Dynamite ;'-)
 
@@ -21,9 +21,8 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; //Dynamite ;'-)
 /**
  * Do some scraping
  */
-const Extractor = require('./lib/Extractor');
 const extractor = new Extractor("/output", process.env.API_ENDPOINT);
-extractor.init({useBlockList : true});
+extractor.init({useBlockList: true});
 
 /**
  * App start
@@ -36,40 +35,40 @@ router.get('/', async (ctx, next) => {
 		version: process.env.API_VERSION,
 		title: "BRANDr API",
 		author: "Scienta",
-		copyright: "\u00A9 Scienta " + (new Date()).getFullYear()
+		copyright: "\u00A9 Scienta " + (new Date()).getFullYear(),
 	};
 });
 
 
 router.post('/extract', async (ctx, next) => {
 	let url = ctx.request.body.endpoint;
-	if(!url) {
-		ctx.throw(400,'No valid endpoint given');
+	if (!url) {
+		ctx.throw(400, 'No valid endpoint given');
 	}
 
 	ctx.body = {
 		uri: url,
-		extractions: await extractor.extract(url)
+		extractions: await extractor.extract(url),
 	};
 });
 
 router.post('/extract/:strategy/download', async (ctx, next) => {
 	let url = ctx.request.body.endpoint;
-	if(!url) {
-		ctx.throw(400,'No valid endpoint given');
+	if (!url) {
+		ctx.throw(400, 'No valid endpoint given');
 	}
 
 	let extractions = await extractor.extract(url);
 
 	let result = extractions[ctx.params.strategy];
-	if(!result) {
+	if (!result) {
 		ctx.throw(400, 'Invalid strategy provided');
-	} else if(Array.isArray(result)){
+	} else if (Array.isArray(result)) {
 		result = result[0];
 	}
 
-	if(result.logo && result.logo.buffer) {
-		switch(result.logo.extension) {
+	if (result.logo && result.logo.buffer) {
+		switch (result.logo.extension) {
 			case "png":
 				ctx.type = "image/png";
 				break;
@@ -101,7 +100,6 @@ const koaLog = logger();
 app.use(async function (ctx, next) {
 	return debug.enabled ? koaLog(ctx, next) : await next();
 });
-
 
 app.use(bodyParser());
 app.use(conditional());
