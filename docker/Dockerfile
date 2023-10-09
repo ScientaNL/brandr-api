@@ -41,6 +41,8 @@ RUN wget -P /app/resources/hosts-blocklist https://github.com/notracking/hosts-b
 COPY ./app/package.json ./app/yarn.lock ./
 RUN yarn set version stable && yarn install --immutable
 
+COPY ./app ./
+
 RUN mkdir -p /output
 
 # Run custom commands by overwriting docker entrypoint
