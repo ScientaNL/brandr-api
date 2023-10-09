@@ -38,7 +38,7 @@ WORKDIR /app
 
 RUN wget -P /app/resources/hosts-blocklist https://github.com/notracking/hosts-blocklists/raw/master/domains.txt
 
-COPY ./app/package.json ./app/yarn.lock ./
+COPY ./app ./
 RUN yarn set version stable && yarn install --immutable
 
 RUN mkdir -p /output
