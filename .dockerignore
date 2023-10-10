@@ -1,4 +1,3 @@
 .git
-.yarn
 vendor
 resources/script/node_modules

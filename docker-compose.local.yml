@@ -13,4 +13,4 @@ services:
       - NODE_ENV=dev
       - API_ENDPOINT=${API_ENDPOINT}
       - DEBUG=*,-navigator:info,-sequelize*,-koa*,-nodemon*,-snapdragon*,-puppeteer*
-    command: ["yarn", "run", "dev"]
+    command: ["npm", "run", "dev"]

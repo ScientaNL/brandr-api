@@ -38,8 +38,8 @@ WORKDIR /app
 
 RUN wget -P /app/resources/hosts-blocklist https://github.com/notracking/hosts-blocklists/raw/master/domains.txt
 
-COPY ./app/package.json ./app/yarn.lock ./
-RUN yarn set version stable && yarn install --immutable
+COPY ./app/package.json ./app/package-lock.json ./
+RUN npm ci
 
 COPY ./app ./
 
@@ -59,4 +59,4 @@ USER pptruser
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD [ "yarn", "run", "start" ]
+CMD [ "npm", "run", "start" ]
