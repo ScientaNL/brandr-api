@@ -4,5 +4,3 @@
 
 /vendor
 /app/node_modules
-/app/yarn-error.log
-/app/.yarn
