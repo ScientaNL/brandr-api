@@ -12,8 +12,8 @@ export default class TwitterLogoStrategy extends AbstractStrategy {
 
 	getParserFilesToInject() {
 		return [
-			dirname + "/../AbstractMetaExtractorParser.js",
-			dirname + "/TwitterLogoStrategyParser.js",
+			path.normalize(dirname + "/../AbstractMetaExtractorParser.js"),
+			path.normalize(dirname + "/TwitterLogoStrategyParser.js"),
 		];
 	}
 

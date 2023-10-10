@@ -47,7 +47,7 @@ export default class AbstractStrategy {
 			result.origin = response.url || src;
 		}
 
-		const imageInfo = imageType(result.buffer);
+		const imageInfo = await imageType(result.buffer);
 
 		if (imageInfo) {
 			switch (imageInfo.ext) {
@@ -75,7 +75,7 @@ export default class AbstractStrategy {
 				default:
 					return null;
 			}
-		} else if (isSvg(result.buffer) === true) {
+		} else if (isSvg(result.buffer.toString()) === true) {
 			result.extension = "svg";
 		} else {
 			return null;
@@ -84,12 +84,11 @@ export default class AbstractStrategy {
 		return result;
 	}
 
+	/** @param {string} svg */
 	async parseSvg(svg) {
-		let buffer = Buffer.from(svg);
-
-		if (isSvg(buffer) === true) {
+		if (isSvg(svg)) {
 			return {
-				buffer: buffer,
+				buffer: Buffer.from(svg),
 				extension: "svg",
 				origin: "[inline]",
 			};
@@ -101,7 +100,7 @@ export default class AbstractStrategy {
 	async parseIco(icoBuffer) {
 		try {
 			let pngBuffer = await icoToPng(icoBuffer, 1024);
-			let imageInfo = imageType(pngBuffer);
+			let imageInfo = await imageType(pngBuffer);
 
 			return (imageInfo.ext === "png") ? pngBuffer : null;
 		} catch (e) {

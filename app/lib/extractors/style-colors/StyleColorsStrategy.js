@@ -11,12 +11,13 @@ export default class StyleColorsStrategy extends AbstractStrategy {
 	}
 
 	getParserFilesToInject() {
-		return [dirname + "/StyleColorsStrategyParser.js"];
+		return [
+			path.normalize(dirname + "/StyleColorsStrategyParser.js")
+		];
 	}
 
 	/**
 	 * This method is executed in the context of the Headless Chrome Browser
-	 * @returns {Array}
 	 */
 	parsePage() {
 		let parser = new StyleColorsStrategyParser();
