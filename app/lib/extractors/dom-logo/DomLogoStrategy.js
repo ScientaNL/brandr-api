@@ -11,7 +11,9 @@ export default class DomLogoStrategy extends AbstractStrategy {
 	}
 
 	getParserFilesToInject() {
-		return [dirname + '/DomLogoStrategyParser.js'];
+		return [
+			path.normalize(dirname + '/DomLogoStrategyParser.js')
+		];
 	}
 
 	async handlePage(page, cdp) {

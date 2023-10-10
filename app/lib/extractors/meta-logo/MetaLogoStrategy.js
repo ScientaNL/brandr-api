@@ -12,8 +12,8 @@ export default class MetaLogoStrategy extends AbstractStrategy {
 
 	getParserFilesToInject() {
 		return [
-			dirname + "/../AbstractMetaExtractorParser.js",
-			dirname + "/MetaLogoStrategyParser.js",
+			path.normalize(dirname + "/../AbstractMetaExtractorParser.js"),
+			path.normalize(dirname + "/MetaLogoStrategyParser.js"),
 		];
 	}
 

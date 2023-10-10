@@ -12,8 +12,8 @@ export default class FacebookLogoStrategy extends AbstractStrategy {
 
 	getParserFilesToInject() {
 		return [
-			dirname + "/../AbstractMetaExtractorParser.js",
-			dirname + "/FacebookLogoStrategyParser.js",
+			path.normalize(dirname + "/../AbstractMetaExtractorParser.js"),
+			path.normalize(dirname + "/FacebookLogoStrategyParser.js"),
 		];
 	}
 

@@ -86,6 +86,7 @@ export default class Extractor {
 		// ]));
 	}
 
+	/** @param {AbstractStrategy} extractor */
 	registerExtractor(extractor) {
 		this.extractors[extractor.constructor.getId()] = extractor;
 	}
@@ -150,7 +151,7 @@ export default class Extractor {
 			let extractor = this.extractors[groupName];
 
 			for (let filePath of extractor.getParserFilesToInject()) {
-				if (addedScripts.indexOf(filePath) === -1) {
+				if (!addedScripts.includes(filePath)) {
 					await page.addScriptTag({path: filePath});
 					addedScripts.push(filePath);
 				}
