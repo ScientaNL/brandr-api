@@ -63,3 +63,16 @@ A response could like the result displayed below. The logo array contains our gu
     }
 }
 ```
+
+
+## Contributing
+For an effortless local development setup, execute the command below:
+
+```shell
+cd app && \
+npm install && \
+docker-compose -f docker-compose.local.yml up -d --force-recreate && \
+docker-compose -f docker-compose.local.yml logs -f
+```
+
+Thank you for your interest in contributing to the BRANDr API!
