@@ -7,15 +7,17 @@ The project utilizes [Puppeteer](https://github.com/GoogleChrome/puppeteer) in o
 - Social data parsing
 - Color usage parsing
 
+
 ## Deploying the BRANDr API
 Checkout the repository, create your own `.env` file (the defaults should be fine) and deploy the BRANDr API Docker container using `docker-compose`:
 
-```bash
-docker-compose -f docker-compose.local.yml up -d --force-recreate \
-  && docker-compose -f docker-compose.local.yml logs -f
+```shell
+docker-compose -f docker-compose.yml up -d --force-recreate \
+  && docker-compose -f docker-compose.yml logs -f
 ```
 
-Use `docker logs` to monitor the container usage and debug information.
+This command uses `docker logs` to monitor the container usage and debug information.
+
 
 ## Using the API
 Check out the API with your favorite REST request tool, such as Postman.
