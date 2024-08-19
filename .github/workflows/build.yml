@@ -4,6 +4,12 @@ on:
     types: [ released ]
   push:
     branches: [ '**' ]
+permissions:
+  id-token: write
+  contents: read
+env:
+  ECR_REPO_URL: ${{ secrets.AWS_RELEASE_ECR_REPO }}
+  DEV_ECR_REPO_URL: ${{ secrets.AWS_DEVELOPMENT_ECR_REPO }}
 jobs:
   build-brandr-api-container:
     name: Build brandr-api container
@@ -21,39 +27,47 @@ jobs:
       - name: Set Github environment variables
         uses: ScientaNL/github-actions-env-toolkit@1.1.0
 
-      - name: DockerHub Login
-        uses: docker/login-action@v3
+      - name: Configure AWS Credentials for release
+        uses: aws-actions/configure-aws-credentials@v4
+        if: github.event_name == 'release'
         with:
-          username: ${{ secrets.DOCKERHUB_PUBLIC_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PUBLIC_TOKEN }}
+          aws-region: eu-central-1
+          role-to-assume: ${{ secrets.AWS_RELEASE_ECR_ROLE }}
+          role-session-name: "GithubActions-Release"
+
+      - name: Login to Amazon ECR Operations
+        id: login-ecr-ops
+        if: github.event_name == 'release'
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: ${{ secrets.AWS_OPERATIONS_ACCOUNT_ID }}
+
+      - name: Configure AWS Credentials for development
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-3
+          role-to-assume: ${{ secrets.AWS_DEVELOPMENT_ECR_ROLE }}
+          role-session-name: "GithubActions-DEV"
+
+      - name: Login to Amazon ECR Development
+        id: login-ecr-dev
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: ${{ secrets.AWS_DEVELOPMENT_ACCOUNT_ID }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build & push Docker image for branch
-        uses: docker/build-push-action@v5
-        with:
-          file: ./docker/Dockerfile
-          context: .
-          build-args: |
-            - API_VERSION=${{env.GITHUB_REF_NAME_SLUG}}-${{env.GITHUB_SHA_SHORT}}
-          push: true
-          tags: scienta/brandr-api:branch-${{env.GITHUB_REF_NAME_SLUG}}
-          cache-from: |
-            type=registry,ref=scienta/brandr-api:cache-branch-${{env.GITHUB_REF_NAME_SLUG}}
-            type=registry,ref=scienta/brandr-api:cache-branch-master
-          cache-to: type=registry,ref=scienta/brandr-api:cache-branch-${{env.GITHUB_REF_NAME_SLUG}}
-
-      - name: Build & push Docker image for release
-        if: github.event_name == 'release'
-        uses: docker/build-push-action@v2
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v6
         with:
           file: ./docker/Dockerfile
           context: .
           push: true
-          tags: scienta/brandr-api:${{env.GITHUB_REF_NAME_SLUG}}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          tags: |
+            ${{ env.DEV_ECR_REPO_URL }}/scienta/brandr-api:${{ github.event_name == 'push' && 'branch-' || '' }}${{env.GITHUB_REF_NAME_SLUG}}
+            ${{ github.event_name == 'release' && format('{0}/scienta/brandr-api:{1}', env.ECR_REPO_URL, env.GITHUB_REF_NAME_SLUG) || '' }}
           build-args: |
-            - API_VERSION=${{env.GITHUB_REF_NAME_SLUG}}
-
+            - API_VERSION=${{ github.event_name == 'push' && format('{0}-{1}', env.GITHUB_REF_NAME_SLUG, env.GITHUB_SHA_SHORT) || env.GITHUB_REF_NAME_SLUG }}
+          cache-from: type=registry,ref=${{ env.DEV_ECR_REPO_URL }}/scienta/brandr-api:cache
+          cache-to: image-manifest=true,oci-mediatypes=true,type=registry,mode=max,ref=${{ env.DEV_ECR_REPO_URL }}/scienta/brandr-api:cache
